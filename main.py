@@ -174,6 +174,10 @@ async def product_page(product_slug: str):
         return FileResponse("product.html")
     raise HTTPException(status_code=404, detail="Product not found")
 
+@app.get("/yandex_6407bd5a232ac6e8.html", response_class=Response)
+async def read_yandex_verification():
+    return FileResponse("yandex_6407bd5a232ac6e8.html")
+
 @app.get("/deploy.js")  # Hide deploy script
 async def read_deploy():
     raise HTTPException(status_code=404)

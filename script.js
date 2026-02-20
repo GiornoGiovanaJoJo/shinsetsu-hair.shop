@@ -204,22 +204,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- FAQ Accordion ---
+    // --- FAQ Auto-Slider ---
     const faqItems = document.querySelectorAll('.faq__item');
+    const faqDots = document.querySelectorAll('.faq__pagination .dot');
+    let currentFaqIndex = 0;
+    let faqInterval;
 
-    faqItems.forEach(item => {
-        const question = item.querySelector('.faq__question');
-        question.addEventListener('click', () => {
-            // Close others
-            faqItems.forEach(otherItem => {
-                if (otherItem !== item) {
-                    otherItem.classList.remove('active');
-                }
+    const showFaqItem = (index) => {
+        if (!faqItems.length) return;
+        faqItems.forEach(item => item.classList.remove('active'));
+        faqDots.forEach(dot => dot.classList.remove('active'));
+
+        faqItems[index].classList.add('active');
+        if (faqDots[index]) faqDots[index].classList.add('active');
+        currentFaqIndex = index;
+    };
+
+    const nextFaqItem = () => {
+        if (!faqItems.length) return;
+        const nextIndex = (currentFaqIndex + 1) % faqItems.length;
+        showFaqItem(nextIndex);
+    };
+
+    if (faqItems.length > 0) {
+        showFaqItem(0);
+        faqInterval = setInterval(nextFaqItem, 5000);
+
+        faqDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                clearInterval(faqInterval);
+                showFaqItem(index);
+                faqInterval = setInterval(nextFaqItem, 5000);
             });
-            // Toggle current
-            item.classList.toggle('active');
         });
-    });
+    }
 
     // --- Footer Form Submission ---
     const footerForm = document.getElementById('footerForm');

@@ -97,7 +97,7 @@
             <div class="hero__overlay"></div>
         </div>
         <div class="hero__content container">
-            <div class="hero__badge">НОВОЕ ПРЕДЛОЖЕНИЕ <span class="hero__badge-accent">+ 15%</span></div>
+            <div class="hero__badge" style="top: 436px; left: 40px; width: 284px; height: 56px; border: 1px solid #D54C73; display: flex; align-items: center; justify-content: center; padding: 0;">НОВОЕ ПРЕДЛОЖЕНИЕ <span class="hero__badge-accent" style="margin-left: 6px;">+ 15%</span></div>
             <h1 class="hero__title">
                 SHINSETSU HAIR —<br>
                 СКУПКА НАТУРАЛЬНЫХ ВОЛОС
@@ -310,8 +310,7 @@
 
                 <div class="timeline__item">
                     <div class="timeline__left">
-                        <p class="timeline__text align-right">Используйте калькулятор, заполните данные и прикрепите
-                            фото.</p>
+                        <p class="timeline__text align-right">Используйте калькулятор, заполните данные и прикрепите фото.</p>
                     </div>
                     <div class="timeline__center">
                         <div class="timeline__dot"></div>
@@ -329,8 +328,7 @@
                         <div class="timeline__dot"></div>
                     </div>
                     <div class="timeline__right">
-                        <p class="timeline__text">Личная встреча с нами или с нашими представителями, для итоговой
-                            оценки и срезки.</p>
+                        <p class="timeline__text timeline__text--multiline" style="text-align: center; white-space: normal;">Личная встреча с нами или с нашими представителями,<br>для итоговой оценки</p>
                     </div>
                 </div>
             </div>
@@ -342,35 +340,32 @@
         <div class="container">
             <h2 class="section-title text-center">ЧАСТО ЗАДАВАЕМЫЕ ВОПРОСЫ</h2>
 
-            <div class="faq__list">
-                <div class="faq__item active">
-                    <div class="faq__question">
-                        <span>Какова минимальная длина?</span>
+            <div class="faq__list container">
+                <div class="faq__items-wrapper">
+                    <div class="faq__item active">
+                        <div class="faq__row">
+                            <span class="faq__question">Какова минимальная длина?</span>
+                            <span class="faq__answer">Минимальная длина — 40 см.</span>
+                        </div>
+                        <div class="faq__line"></div>
                     </div>
-                    <div class="faq__answer">
-                        <p>Минимальная длина — 40 см. Чем длиннее, тем выше цена!</p>
+                    <div class="faq__item">
+                        <div class="faq__row">
+                            <span class="faq__question">Как происходит оплата?</span>
+                            <span class="faq__answer">Оплата производится сразу после среза.</span>
+                        </div>
+                        <div class="faq__line"></div>
                     </div>
-                </div>
-                <div class="faq__item">
-                    <div class="faq__question">
-                        <span>Как происходит оплата?</span>
-                    </div>
-                    <div class="faq__answer">
-                        <p>Оплата производится сразу после среза и взвешивания волос, удобным для вас способом
-                            (наличными или на карту).</p>
-                    </div>
-                </div>
-                <div class="faq__item">
-                    <div class="faq__question">
-                        <span>Влияет ли цвет на цену?</span>
-                    </div>
-                    <div class="faq__answer">
-                        <p>Да, светлые и натуральные оттенки (блонд, русый) обычно оцениваются дороже темных.</p>
+                    <div class="faq__item">
+                        <div class="faq__row">
+                            <span class="faq__question">Влияет ли цвет на цену?</span>
+                            <span class="faq__answer">Да, светлые оттенки оцениваются дороже.</span>
+                        </div>
+                        <div class="faq__line"></div>
                     </div>
                 </div>
                 <div class="faq__pagination">
                     <span class="dot active"></span>
-                    <span class="dot"></span>
                     <span class="dot"></span>
                     <span class="dot"></span>
                 </div>
@@ -424,13 +419,17 @@
                 <div class="footer__col footer__col--form">
                     <p class="footer__form-title">Запросите звонок, и мы с вами свяжемся.</p>
                     <form id="footerForm" class="footer__form">
-                        <input type="text" name="name" placeholder="Как к вам обращаться?" class="footer__input"
-                            required>
-                        <input type="text" name="fullname" placeholder="Полное имя" class="footer__input" required>
-                        <input type="text" name="contact" placeholder="Как можно с вами связаться?"
-                            class="footer__input" required>
-                        <input type="tel" name="phone" placeholder="Ваш номер телефона" class="footer__input" required>
-                        <button type="submit" class="btn-primary mt-sm">ЗАКАЗАТЬ ЗВОНОК</button>
+                        <div class="footer__form-group">
+                            <label class="footer__input-label">Как к вам обращаться?</label>
+                            <input type="text" name="fullname" placeholder="Полное имя" class="footer__input" required>
+                            <div class="footer__input-line"></div>
+                        </div>
+                        <div class="footer__form-group mt-12">
+                            <label class="footer__input-label">Как можно с вами связаться?</label>
+                            <input type="tel" name="phone" placeholder="Ваш номер телефона" class="footer__input" required>
+                            <div class="footer__input-line"></div>
+                        </div>
+                        <button type="submit" class="btn-primary" style="margin-top: 24px; width: 172px; height: 48px; display: flex; align-items: center; justify-content: center; align-self: flex-start; padding: 0;">ЗАКАЗАТЬ ЗВОНОК</button>
                     </form>
                 </div>
             </div>

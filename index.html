@@ -177,8 +177,8 @@
     <section class="hero" id="hero">
         <div class="hero__bg">
             <picture>
-                <source srcset="templates/Background.webp" type="image/webp">
-                <img src="templates/Background.png" alt="Магазин натуральных волос для наращивания" class="hero__image">
+                <source srcset="templates/Header.webp" type="image/webp">
+                <img src="templates/Header.png" alt="Скупка натуральных волос" class="hero__image">
             </picture>
             <div class="hero__overlay"></div>
         </div>
@@ -249,95 +249,98 @@
                         </div>
 
 
-                        <div class="form-group">
-                            <label class="form-label">Ваше имя</label>
-                            <input type="text" name="name" class="form-input" placeholder="Полное имя" required>
+                        <div class="calc-form__row">
+                            <div class="form-group">
+                                <label class="form-label">Ваше имя</label>
+                                <input type="text" name="name" class="form-input" placeholder="Полное имя" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Телефон</label>
+                                <input type="tel" name="phone" class="form-input" placeholder="+7 (999) 999 99 99"
+                                    required>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Телефон</label>
-                            <input type="tel" name="phone" class="form-input" placeholder="+7 (999) 999 99 99" required>
+
+                        <div class="calc-form__row">
+                            <div class="form-group">
+                                <label class="form-label">Почта</label>
+                                <input type="email" name="email" class="form-input" placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Город</label>
+                                <input type="text" name="city" class="form-input" placeholder="Москва" required>
+                            </div>
                         </div>
-                </div>
 
-                <div class="calc-form__row">
-                    <div class="form-group">
-                        <label class="form-label">Почта</label>
-                        <input type="email" name="email" class="form-input" placeholder="your@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Город</label>
-                        <input type="text" name="city" class="form-input" placeholder="Москва" required>
-                    </div>
-                </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Сообщение (по желанию)</label>
+                            <textarea name="message" class="form-textarea"
+                                placeholder="Напишите ваше сообщение..."></textarea>
+                        </div>
 
-                <div class="form-group full-width">
-                    <label class="form-label">Сообщение (по желанию)</label>
-                    <textarea name="message" class="form-textarea" placeholder="Напишите ваше сообщение..."></textarea>
-                </div>
-
-                <div class="form-group full-width">
-                    <label class="form-label">Фото волос (обязательно минимум 1 фото)</label>
-                    <div class="photo-upload-grid">
-                        <label class="photo-upload-box">
-                            <input type="file" name="photo1" accept="image/*" class="photo-input" required>
-                            <div class="photo-upload-content">
-                                <span class="photo-label">фото 1</span>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path
-                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                                    <circle cx="12" cy="13" r="4" />
-                                </svg>
+                        <div class="form-group full-width">
+                            <label class="form-label">Фото волос (обязательно минимум 1 фото)</label>
+                            <div class="photo-upload-grid">
+                                <label class="photo-upload-box">
+                                    <input type="file" name="photo1" accept="image/*" class="photo-input" required>
+                                    <div class="photo-upload-content">
+                                        <span class="photo-label">фото 1</span>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path
+                                                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                            <circle cx="12" cy="13" r="4" />
+                                        </svg>
+                                    </div>
+                                    <img src="" alt="" class="photo-preview" hidden>
+                                </label>
+                                <label class="photo-upload-box">
+                                    <input type="file" name="photo2" accept="image/*" class="photo-input">
+                                    <div class="photo-upload-content">
+                                        <span class="photo-label">фото 2</span>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path
+                                                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                            <circle cx="12" cy="13" r="4" />
+                                        </svg>
+                                    </div>
+                                    <img src="" alt="" class="photo-preview" hidden>
+                                </label>
+                                <label class="photo-upload-box">
+                                    <input type="file" name="photo3" accept="image/*" class="photo-input">
+                                    <div class="photo-upload-content">
+                                        <span class="photo-label">фото 3</span>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path
+                                                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                            <circle cx="12" cy="13" r="4" />
+                                        </svg>
+                                    </div>
+                                    <img src="" alt="" class="photo-preview" hidden>
+                                </label>
                             </div>
-                            <img src="" alt="" class="photo-preview" hidden>
-                        </label>
-                        <label class="photo-upload-box">
-                            <input type="file" name="photo2" accept="image/*" class="photo-input">
-                            <div class="photo-upload-content">
-                                <span class="photo-label">фото 2</span>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path
-                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                                    <circle cx="12" cy="13" r="4" />
-                                </svg>
-                            </div>
-                            <img src="" alt="" class="photo-preview" hidden>
-                        </label>
-                        <label class="photo-upload-box">
-                            <input type="file" name="photo3" accept="image/*" class="photo-input">
-                            <div class="photo-upload-content">
-                                <span class="photo-label">фото 3</span>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path
-                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                                    <circle cx="12" cy="13" r="4" />
-                                </svg>
-                            </div>
-                            <img src="" alt="" class="photo-preview" hidden>
-                        </label>
-                    </div>
+                        </div>
+
+                        <div class="calc-result">
+                            <span class="calc-result__label">Ориентировочная стоимость</span>
+                            <span class="calc-result__value">-</span>
+                        </div>
+
+                        <button type="submit" class="btn-primary full-width">ЗАКАЗАТЬ ВОЛОСЫ</button>
+                    </form>
                 </div>
 
-                <div class="calc-result">
-                    <span class="calc-result__label">Ориентировочная стоимость</span>
-                    <span class="calc-result__value">-</span>
+                <!-- Mascot Image -->
+                <div class="calculator__mascot-col">
+                    <picture>
+                        <source srcset="templates/Rectangle 460.webp" type="image/webp">
+                        <img src="templates/Rectangle 460.png" alt="Заказать натуральные волосы онлайн"
+                            class="calculator__mascot" loading="lazy">
+                    </picture>
                 </div>
-
-                <button type="submit" class="btn-primary full-width">ЗАКАЗАТЬ ВОЛОСЫ</button>
-                </form>
             </div>
-
-            <!-- Mascot Image -->
-            <div class="calculator__mascot-col">
-                <picture>
-                    <source srcset="templates/Rectangle 460.webp" type="image/webp">
-                    <img src="templates/Rectangle 460.png" alt="Заказать натуральные волосы онлайн"
-                        class="calculator__mascot" loading="lazy">
-                </picture>
-            </div>
-        </div>
         </div>
     </section>
 

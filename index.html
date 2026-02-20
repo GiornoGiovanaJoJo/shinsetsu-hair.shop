@@ -84,8 +84,9 @@
             position: relative;
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: flex-end;
+            justify-content: flex-start;
+            padding-bottom: 5%;
             overflow: hidden;
         }
 
@@ -106,8 +107,9 @@
 
         .hero__content {
             z-index: 1;
-            text-align: center;
+            text-align: left;
             padding: 2rem 1rem;
+            width: 100%;
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -175,8 +177,8 @@
     <section class="hero" id="hero">
         <div class="hero__bg">
             <picture>
-                <source srcset="templates/Header.webp" type="image/webp">
-                <img src="templates/Header.png" alt="Магазин натуральных волос для наращивания" class="hero__image">
+                <source srcset="templates/Background.webp" type="image/webp">
+                <img src="templates/Background.png" alt="Магазин натуральных волос для наращивания" class="hero__image">
             </picture>
             <div class="hero__overlay"></div>
         </div>

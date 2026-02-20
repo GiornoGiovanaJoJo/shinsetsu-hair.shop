@@ -153,31 +153,26 @@ async def read_script():
     
 @app.get("/robots.txt", response_class=Response)
 async def read_robots():
-    content = """User-agent: *
-Disallow: /admin/
-Disallow: /*?*sort=
-Disallow: /*?*filter=
+    content = """User-agent: * 
 Allow: /
-
-Host: https://shinsetsu-hair.shop
-Sitemap: https://shinsetsu-hair.shop/sitemap.xml
-"""
+Disallow: /admin/
+Disallow: /cart/
+Sitemap: https://shinsetsu-hair.shop/sitemap.xml"""
     return Response(content=content, media_type="text/plain")
 
 @app.get("/sitemap.xml", response_class=Response)
 async def generate_sitemap():
-    urlset = ET.Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
-    
-    # Главная
-    url = ET.SubElement(urlset, "url")
-    ET.SubElement(url, "loc").text = "https://shinsetsu-hair.shop/"
-    ET.SubElement(url, "changefreq").text = "daily"
-    ET.SubElement(url, "priority").text = "1.0"
-    
-    # We only have a landing page currently, so keeping it simple.
-    
-    xml_content = ET.tostring(urlset, encoding="utf-8", method="xml")
-    return Response(content=xml_content, media_type="application/xml")
+    content = """<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>https://shinsetsu-hair.shop/volosy-slavyanskie-60sm/</loc><priority>0.8</priority></url>
+<url><loc>https://shinsetsu-hair.shop/volosy-evropeyskie-50sm/</loc><priority>0.7</priority></url>
+</urlset>"""
+    return Response(content=content, media_type="application/xml")
+
+@app.get("/{product_slug}/", response_class=Response)
+async def product_page(product_slug: str):
+    if product_slug in ["volosy-slavyanskie-60sm", "volosy-evropeyskie-50sm"]:
+        return FileResponse("product.html")
+    raise HTTPException(status_code=404, detail="Product not found")
 
 @app.get("/deploy.js")  # Hide deploy script
 async def read_deploy():

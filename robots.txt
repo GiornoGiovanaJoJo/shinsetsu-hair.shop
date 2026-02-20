@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: /templates/
 Disallow: /fonts/
 Disallow: /uploads/
 Disallow: /deploy.sh

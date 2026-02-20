@@ -1,9 +1,11 @@
 import logging
 import os
 from typing import Optional, List
-from fastapi import FastAPI, Form, UploadFile, File, HTTPException
+from fastapi import FastAPI, Form, UploadFile, File, HTTPException, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
+import xml.etree.ElementTree as ET
+from datetime import datetime
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
 import asyncio
@@ -148,6 +150,34 @@ async def read_styles():
 @app.get("/script.js")
 async def read_script():
     return FileResponse("script.js")
+    
+@app.get("/robots.txt", response_class=Response)
+async def read_robots():
+    content = """User-agent: *
+Disallow: /admin/
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+Allow: /
+
+Host: https://shinsetsu-hair.shop
+Sitemap: https://shinsetsu-hair.shop/sitemap.xml
+"""
+    return Response(content=content, media_type="text/plain")
+
+@app.get("/sitemap.xml", response_class=Response)
+async def generate_sitemap():
+    urlset = ET.Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    
+    # Главная
+    url = ET.SubElement(urlset, "url")
+    ET.SubElement(url, "loc").text = "https://shinsetsu-hair.shop/"
+    ET.SubElement(url, "changefreq").text = "daily"
+    ET.SubElement(url, "priority").text = "1.0"
+    
+    # We only have a landing page currently, so keeping it simple.
+    
+    xml_content = ET.tostring(urlset, encoding="utf-8", method="xml")
+    return Response(content=xml_content, media_type="application/xml")
 
 @app.get("/deploy.js")  # Hide deploy script
 async def read_deploy():

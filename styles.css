@@ -6,9 +6,9 @@
     /* Colors */
     --color-bg: #160706;
     /* Deep dark brownish/purple updated */
-    --color-pink: #D54C73;
-    /* Vibrant accent pink */
-    --color-pink-hover: #E8749A;
+    --color-pink: #C7305C;
+    /* High contrast accent pink */
+    --color-pink-hover: #D54C73;
     --color-text: #FFFFFF;
     --color-text-muted: #AFAFAF;
     --color-border: #443C42;
@@ -150,7 +150,7 @@ ul {
 .btn-vk,
 .btn-tg,
 .btn-call {
-    background-color: #D54C73;
+    background-color: var(--color-pink);
     /* All buttons same pink */
 }
 

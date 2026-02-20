@@ -208,8 +208,8 @@
                     <form id="calcForm" class="calc-form">
                         <div class="calc-form__row">
                             <div class="form-group">
-                                <label class="form-label">Цвет волос</label>
-                                <select name="color" class="form-select" required>
+                                <label class="form-label" for="color-select">Цвет волос</label>
+                                <select id="color-select" name="color" class="form-select" required>
                                     <option value="" disabled selected>Выберите цвет...</option>
                                     <option value="blonde">Блонд</option>
                                     <option value="light-brown">Русые</option>
@@ -220,8 +220,8 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Длина волос</label>
-                                <select name="length" class="form-select" required>
+                                <label class="form-label" for="length-select">Длина волос</label>
+                                <select id="length-select" name="length" class="form-select" required>
                                     <option value="" disabled selected>Выберите длину...</option>
                                     <option value="40-50">40-50 см</option>
                                     <option value="50-60">50-60 см</option>
@@ -233,8 +233,8 @@
 
                         <div class="calc-form__row">
                             <div class="form-group">
-                                <label class="form-label">Структура волос</label>
-                                <select name="structure" class="form-select" required>
+                                <label class="form-label" for="structure-select">Структура волос</label>
+                                <select id="structure-select" name="structure" class="form-select" required>
                                     <option value="" disabled selected>Выберите структуру...</option>
                                     <option value="straight">Прямые (Славянка)</option>
                                     <option value="wavy">Спиральные</option>
@@ -242,8 +242,8 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Тип волос</label>
-                                <select name="condition" class="form-select" required>
+                                <label class="form-label" for="condition-select">Тип волос</label>
+                                <select id="condition-select" name="condition" class="form-select" required>
                                     <option value="" disabled selected>Выберите тип...</option>
                                     <option value="slavic">Славянские</option>
                                     <option value="european">Европейские</option>
@@ -254,30 +254,33 @@
 
                         <div class="calc-form__row">
                             <div class="form-group">
-                                <label class="form-label">Ваше имя</label>
-                                <input type="text" name="name" class="form-input" placeholder="Полное имя" required>
+                                <label class="form-label" for="name-input">Ваше имя</label>
+                                <input id="name-input" type="text" name="name" class="form-input"
+                                    placeholder="Полное имя" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Телефон</label>
-                                <input type="tel" name="phone" class="form-input" placeholder="+7 (999) 999 99 99"
-                                    required>
+                                <label class="form-label" for="phone-input">Телефон</label>
+                                <input id="phone-input" type="tel" name="phone" class="form-input"
+                                    placeholder="+7 (999) 999 99 99" required>
                             </div>
                         </div>
 
                         <div class="calc-form__row">
                             <div class="form-group">
-                                <label class="form-label">Почта</label>
-                                <input type="email" name="email" class="form-input" placeholder="your@email.com">
+                                <label class="form-label" for="email-input">Почта</label>
+                                <input id="email-input" type="email" name="email" class="form-input"
+                                    placeholder="your@email.com">
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Город</label>
-                                <input type="text" name="city" class="form-input" placeholder="Москва" required>
+                                <label class="form-label" for="city-input">Город</label>
+                                <input id="city-input" type="text" name="city" class="form-input" placeholder="Москва"
+                                    required>
                             </div>
                         </div>
 
                         <div class="form-group full-width">
-                            <label class="form-label">Сообщение (по желанию)</label>
-                            <textarea name="message" class="form-textarea"
+                            <label class="form-label" for="message-input">Сообщение (по желанию)</label>
+                            <textarea id="message-input" name="message" class="form-textarea"
                                 placeholder="Напишите ваше сообщение..."></textarea>
                         </div>
 
@@ -555,14 +558,14 @@
                 </div>
 
                 <div class="footer__col">
-                    <h4 class="footer__heading">ЧАСТЫЕ ВОПРОСЫ</h4>
+                    <h3 class="footer__heading">ЧАСТЫЕ ВОПРОСЫ</h3>
                     <ul class="footer__menu">
                         <li><a href="#process">КАК ПРОДАТЬ</a></li>
                     </ul>
                 </div>
 
                 <div class="footer__col">
-                    <h4 class="footer__heading">НАШ АССОРТИМЕНТ</h4>
+                    <h3 class="footer__heading">НАШ АССОРТИМЕНТ</h3>
                     <ul class="footer__menu">
                         <li><a href="#calculator">ОЦЕНКА ВОЛОС</a></li>
                     </ul>
@@ -572,14 +575,15 @@
                     <p class="footer__form-title">Запросите звонок, и мы с вами свяжемся.</p>
                     <form id="footerForm" class="footer__form">
                         <div class="footer__form-group">
-                            <label class="footer__input-label">Как к вам обращаться?</label>
-                            <input type="text" name="fullname" placeholder="Полное имя" class="footer__input" required>
+                            <label class="footer__input-label" for="footer-fullname">Как к вам обращаться?</label>
+                            <input id="footer-fullname" type="text" name="fullname" placeholder="Полное имя"
+                                class="footer__input" required>
                             <div class="footer__input-line"></div>
                         </div>
                         <div class="footer__form-group mt-12">
-                            <label class="footer__input-label">Как можно с вами связаться?</label>
-                            <input type="tel" name="phone" placeholder="Ваш номер телефона" class="footer__input"
-                                required>
+                            <label class="footer__input-label" for="footer-phone">Как можно с вами связаться?</label>
+                            <input id="footer-phone" type="tel" name="phone" placeholder="Ваш номер телефона"
+                                class="footer__input" required>
                             <div class="footer__input-line"></div>
                         </div>
                         <button type="submit" class="btn-primary"

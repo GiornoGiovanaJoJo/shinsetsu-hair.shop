@@ -559,14 +559,31 @@ ul {
     object-fit: cover;
 }
 
-.example-card__label {
+.example-card__content {
     position: absolute;
-    bottom: 20px;
-    left: 20px;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 24px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Отступ между названием и ценой */
+}
+
+.example-card__label {
     font-family: 'Belepotan', serif;
     font-size: 18px;
     font-weight: 700;
     text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    line-height: 1.2;
+}
+
+.example-card__price {
+    font-weight: 600;
+    font-size: 1.125rem;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 

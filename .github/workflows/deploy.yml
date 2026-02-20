@@ -38,13 +38,8 @@ jobs:
                 pip3 install -r requirements.txt --break-system-packages || pip install -r requirements.txt --break-system-packages
             fi
             
-            # Перезапускаем FastAPI (если он запущен через uvicorn напрямую)
-            echo "Restarting uvicorn..."
-            pkill -f "uvicorn main:app" || true
-            nohup uvicorn main:app --host 127.0.0.1 --port 8000 > app.log 2>&1 < /dev/null &
-            
-            # Если вы используете systemd (например, sudo systemctl restart shinsetsu), 
-            # раскомментируйте следующую строку и закомментируйте строки с uvicorn выше:
-            # systemctl restart shinsetsu || true
+            # Перезапускаем FastAPI через pm2, чтобы избежать зависания SSH-сессии
+            echo "Restarting application via pm2..."
+            pm2 restart shinsetsu-hair || echo "PM2 restart failed, checking logs..."
             
             echo "Deployment successful!"

@@ -27,14 +27,7 @@ pip install -r requirements.txt
 echo "Перезапускаем приложение..."
 # Расскомментируйте нужную строку:
 
-# Если через systemd:
-# sudo systemctl restart shinsetsu.service
-
-# Если через pm2 (для server.js или python):
-# pm2 restart shinsetsu-api
-
-# Если просто убиваете процесс и запускаете заново (не рекомендуется для прода):
-# pkill -f "uvicorn main:app"
-# nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
+# Если через pm2 (рекомендуется):
+pm2 restart shinsetsu-hair
 
 echo "Деплой успешно завершен!"

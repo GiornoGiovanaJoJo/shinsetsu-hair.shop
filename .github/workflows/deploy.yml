@@ -35,7 +35,7 @@ jobs:
             
             # Устанавливаем зависимости (если есть)
             if [ -f "requirements.txt" ]; then
-                pip3 install -r requirements.txt || pip install -r requirements.txt
+                pip3 install -r requirements.txt --break-system-packages || pip install -r requirements.txt --break-system-packages
             fi
             
             # Перезапускаем FastAPI (если он запущен через uvicorn напрямую)

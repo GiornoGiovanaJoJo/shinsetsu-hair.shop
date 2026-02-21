@@ -57,7 +57,7 @@ textarea {
 @font-face {
     font-family: 'LT Superior';
     src: url('fonts/LT_superior/LTSuperiorBold.otf') format('opentype');
-    font-weight: bold;
+    font-weight: 700;
     font-style: normal;
     font-display: swap;
 }
@@ -70,6 +70,12 @@ body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     font-size: clamp(14px, 1rem, 16px);
+}
+
+strong,
+b {
+    font-family: 'LT Superior', sans-serif;
+    font-weight: 700;
 }
 
 h1,

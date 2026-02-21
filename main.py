@@ -328,10 +328,14 @@ async def echo_handler(message: types.Message):
                 logger.error(f"Failed to forward message to admin {admin_id}: {e}")
         await message.answer("Ваше сообщение передано администратору.")
 
-# --- Startup ---
+# --- Startup & Shutdown ---
 @app.on_event("startup")
 async def on_startup():
     asyncio.create_task(dp.start_polling(bot))
+
+@app.on_event("shutdown")
+async def on_shutdown():
+    await bot.session.close()
 
 
 

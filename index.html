@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Скупка натуральных волос | Shinsetsu Hair Shop</title>
-    <meta name="description"
-        content="Дорого покупаем славянские, европейские волосы. Длина 40-80 см. Быстрая оценка онлайн. ✓ Высокие цены.">
+    <title>{{ content.meta_title }}</title>
+    <meta name="description" content="{{ content.meta_desc }}">
     <meta name="keywords"
         content="продать волосы, сдать волосы, скупка волос, продать натуральные волосы, продать волосы москва, скупка натуральных волос">
 
@@ -182,22 +181,19 @@
             <div class="hero__overlay"></div>
         </div>
         <div class="hero__content container">
-            <div class="hero__badge">ПОКУПАЕМ ВОЛОСЫ ОТ <span class="hero__badge-accent">40 см</span></div>
+            <div class="hero__badge">{{ content.hero_badge | safe }}</div>
             <h1 class="hero__title">
-                SHINSETSU HAIR —<br>
-                СКУПКА НАТУРАЛЬНЫХ ВОЛОС<br>ПО ВЫГОДНЫМ ЦЕНАМ
+                {{ content.hero_title | safe }}
             </h1>
-            <p class="hero__subtitle">Покупаем славянские и европейские волосы от 40 до 80 см в Москве. Быстрая оценка и
-                выплата
-                в день обращения.</p>
+            <p class="hero__subtitle">{{ content.hero_subtitle | safe }}</p>
         </div>
     </section>
 
     <!-- CALCULATOR SECTION -->
     <section class="calculator" id="calculator">
         <div class="container">
-            <h2 class="section-title text-left pink">ОЦЕНКА СТОИМОСТИ ВАШИХ ВОЛОС</h2>
-            <p class="section-desc text-left">Укажите параметры ваших волос, чтобы узнать предварительную стоимость.</p>
+            <h2 class="section-title text-left pink">{{ content.calc_title }}</h2>
+            <p class="section-desc text-left">{{ content.calc_desc }}</p>
 
             <div class="calculator__grid">
                 <!-- Calculator Form -->
@@ -354,8 +350,8 @@
     <section class="examples" id="examples">
         <div class="container">
             <div class="section-header-row">
-                <h2 class="section-title pink">КАКИЕ ВОЛОСЫ МЫ ПОКУПАЕМ</h2>
-                <p class="section-subtitle">Принимаем волосы различных текстур и оттенков от 40 до 80 см</p>
+                <h2 class="section-title pink">{{ content.examples_title }}</h2>
+                <p class="section-subtitle">{{ content.examples_subtitle }}</p>
             </div>
 
             <div class="examples__grid">
@@ -408,45 +404,45 @@
     <!-- PROCESS SECTION -->
     <section class="process" id="process">
         <div class="container">
-            <h2 class="section-title text-center pink mb-large">КАК ПРОДАТЬ ВОЛОСЫ?</h2>
+            <h2 class="section-title text-center pink mb-large">{{ content.process_title }}</h2>
 
             <div class="timeline">
                 <div class="timeline__item">
                     <div class="timeline__left">
-                        <h3 class="timeline__title align-right">ОЦЕНКА ВОЛОС</h3>
+                        <h3 class="timeline__title align-right">{{ content.process_step1_title }}</h3>
                     </div>
                     <div class="timeline__center">
                         <div class="timeline__dot"></div>
                     </div>
                     <div class="timeline__right">
-                        <p class="timeline__text timeline__text--multiline align-left">Пришлите фото ваших волос с
-                            указанием длины (от 40 см), структуры и веса (если известен).</p>
+                        <p class="timeline__text timeline__text--multiline align-left">{{ content.process_step1_text }}
+                        </p>
                     </div>
                 </div>
 
                 <div class="timeline__item">
                     <div class="timeline__left">
-                        <p class="timeline__text timeline__text--multiline align-right">Заполните форму на сайте или
-                            отправьте фото и информацию в мессенджеры для быстрой оценки.</p>
+                        <p class="timeline__text timeline__text--multiline align-right">{{ content.process_step2_text }}
+                        </p>
                     </div>
                     <div class="timeline__center">
                         <div class="timeline__dot"></div>
                     </div>
                     <div class="timeline__right">
-                        <h3 class="timeline__title align-left">СОГЛАСОВАНИЕ ЦЕНЫ</h3>
+                        <h3 class="timeline__title align-left">{{ content.process_step2_title }}</h3>
                     </div>
                 </div>
 
                 <div class="timeline__item">
                     <div class="timeline__left">
-                        <h3 class="timeline__title align-right">ВСТРЕЧА И ОПЛАТА</h3>
+                        <h3 class="timeline__title align-right">{{ content.process_step3_title }}</h3>
                     </div>
                     <div class="timeline__center">
                         <div class="timeline__dot"></div>
                     </div>
                     <div class="timeline__right">
-                        <p class="timeline__text timeline__text--multiline align-left">Мы договоримся о встрече или
-                            организуем выезд мастера.<br>Оплата производится сразу после среза.</p>
+                        <p class="timeline__text timeline__text--multiline align-left">{{ content.process_step3_text |
+                            safe }}</p>
                     </div>
                 </div>
             </div>
@@ -456,34 +452,10 @@
     <!-- SEO TEXT SECTION -->
     <section class="seo-text" id="about">
         <div class="container">
-            <h2 class="section-title text-left pink">ПРОДАТЬ ВОЛОСЫ ДОРОГО</h2>
+            <h2 class="section-title text-left pink">{{ content.seo_title }}</h2>
             <div class="seo-content"
                 style="margin-top: 1rem; color: var(--text-color); line-height: 1.6; opacity: 0.9;">
-                <p>Ищете, где выгодно <strong>продать волосы в Москве</strong>? <strong>Shinsetsu
-                        Hair</strong> — это
-                    надежная скупка натуральных волос. В нашем каталоге представлены исключительно
-                    качественные, бережно обработанные <strong>славянские и европейские волосы</strong>. Мы предлагаем
-                    одни из самых лояльных условий на рынке, гарантируя быструю оценку и моментальную выплату.</p>
-                <div style="margin-top: 1rem;">
-                    <h3>Покупаем волосы от 40 до 80 см</h3>
-                    <p>Хотите узнать, какова актуальная <strong>стоимость ваших волос</strong>? Загляните в калькулятор
-                        выше. Мы покупаем волосы длиной от 40 до 80 сантиметров. Особенно высоко ценятся
-                        светлые (блонд, русый) оттенки категории «Люкс» — это <strong>натуральные волосы 60 см</strong>
-                        и длиннее, не имеющие сечения, с ровным плотным срезом на концах.</p>
-                </div>
-                <div style="margin-top: 1rem;">
-                    <h3>Почему выбирают Shinsetsu Hair?</h3>
-                    <ul>
-                        <li>Высокая стоимость выкупа волос — платим больше других;</li>
-                        <li>Принимаем волосы разных оттенков и структур;</li>
-                        <li>Моментальная оплата наличными или на карту сразу после среза;</li>
-                        <li>Бесплатная или компенсируемая стрижка от профессионального мастера.</li>
-                    </ul>
-                    <p style="margin-top: 0.5rem;">Не знаете, как правильно оценить свои волосы? Оставьте заявку с фото,
-                        и мы бесплатно проконсультируем вас по всем вопросам. Убедитесь сами —
-                        <strong>продать волосы</strong> можно выгодно, быстро и безопасно!
-                    </p>
-                </div>
+                {{ content.seo_text | safe }}
             </div>
         </div>
     </section>
@@ -491,32 +463,29 @@
     <!-- FAQ SECTION -->
     <section class="faq" id="faq">
         <div class="container">
-            <h2 class="section-title text-center">ЧАСТО ЗАДАВАЕМЫЕ ВОПРОСЫ</h2>
+            <h2 class="section-title text-center">{{ content.faq_title }}</h2>
 
             <div class="faq__list container">
                 <div class="faq__items-wrapper">
                     <div class="faq__item active">
                         <div class="faq__row">
-                            <h3 class="faq__question" style="font-size: inherit; font-weight: inherit; margin: 0;">
-                                От чего зависит цена выкупа волос?</h3>
-                            <span class="faq__answer">Стоимость зависит от длины, веса, цвета (светлые оттенки ценятся
-                                выше) и состояния.</span>
+                            <h3 class="faq__question" style="font-size: inherit; font-weight: inherit; margin: 0;">{{
+                                content.faq_q1 }}</h3>
+                            <span class="faq__answer">{{ content.faq_a1 }}</span>
                         </div>
                     </div>
                     <div class="faq__item">
                         <div class="faq__row">
-                            <h3 class="faq__question" style="font-size: inherit; font-weight: inherit; margin: 0;">Как
-                                происходит оплата?</h3>
-                            <span class="faq__answer">Мы переводим деньги на карту или выплачиваем наличными сразу после
-                                оценки и взвешивания волос.</span>
+                            <h3 class="faq__question" style="font-size: inherit; font-weight: inherit; margin: 0;">{{
+                                content.faq_q2 }}</h3>
+                            <span class="faq__answer">{{ content.faq_a2 }}</span>
                         </div>
                     </div>
                     <div class="faq__item">
                         <div class="faq__row">
-                            <h3 class="faq__question" style="font-size: inherit; font-weight: inherit; margin: 0;">
-                                Могу ли я продать окрашенные волосы?</h3>
-                            <span class="faq__answer">Да, мы рассматриваем окрашенные волосы, но их стоимость
-                                оценивается индивидуально. Пришлите фото для точной оценки.</span>
+                            <h3 class="faq__question" style="font-size: inherit; font-weight: inherit; margin: 0;">{{
+                                content.faq_q3 }}</h3>
+                            <span class="faq__answer">{{ content.faq_a3 }}</span>
                         </div>
                     </div>
                 </div>
@@ -539,8 +508,8 @@
             <div class="cta-banner__overlay"></div>
         </div>
         <div class="cta-banner__content container">
-            <h2 class="cta-banner__title">ХОТИТЕ ПРОДАТЬ ВОЛОСЫ?</h2>
-            <p class="cta-banner__subtitle">Оставьте заявку, и мы предложим выгодную цену за ваш срез.</p>
+            <h2 class="cta-banner__title">{{ content.cta_title }}</h2>
+            <p class="cta-banner__subtitle">{{ content.cta_subtitle }}</p>
             <div class="cta-banner__buttons">
                 <a href="tel:+79119571712" class="btn-social btn-vk" target="_blank" rel="noopener noreferrer">MAX</a>
                 <a href="https://t.me/nadi_9911" class="btn-social btn-tg" target="_blank"

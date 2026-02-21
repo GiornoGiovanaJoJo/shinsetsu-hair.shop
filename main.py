@@ -1,9 +1,12 @@
 import logging
 import os
-from typing import Optional, List
-from fastapi import FastAPI, Form, UploadFile, File, HTTPException, Response
+import json
+from typing import Optional, List, Dict, Any
+from fastapi import FastAPI, Form, UploadFile, File, HTTPException, Response, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from aiogram import Bot, Dispatcher, types
@@ -132,6 +135,18 @@ dp = Dispatcher()
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="."), name="static")
+app.mount("/templates", StaticFiles(directory="templates"), name="templates_static")
+app.mount("/fonts", StaticFiles(directory="fonts"), name="fonts_static")
+
+# Jinja2 setup
+templates = Jinja2Templates(directory=".")
+
+def get_content():
+    try:
+        with open("content.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
 
 # Ensure uploads directory exists
 UPLOAD_DIR = "uploads"
@@ -140,8 +155,9 @@ if not os.path.exists(UPLOAD_DIR):
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 @app.get("/")
-async def read_index():
-    return FileResponse("index.html")
+async def read_index(request: Request):
+    content = get_content()
+    return templates.TemplateResponse("index.html", {"request": request, "content": content})
 
 @app.get("/styles.css")
 async def read_styles():
@@ -318,9 +334,38 @@ async def echo_handler(message: types.Message):
 async def on_startup():
     asyncio.create_task(dp.start_polling(bot))
 
+# --- Admin Routes ---
+@app.get("/admin", tags=["Admin"])
+async def read_admin(request: Request):
+    """Returns the Admin Panel HTML interface."""
+    content = get_content()
+    return templates.TemplateResponse("admin.html", {"request": request, "content": content})
+
+class AdminSaveRequest(BaseModel):
+    secret_key: str
+    content: Dict[str, Any]
+
+@app.post("/admin/save", tags=["Admin"])
+async def save_admin(payload: AdminSaveRequest):
+    """Saves updated JSON content from the Admin panel."""
+    if payload.secret_key != "Nikitoso02-":
+        return JSONResponse(status_code=403, content={"success": False, "message": "Неверный секретный ключ!"})
+    
+    new_content = payload.content
+    if not new_content:
+        return JSONResponse(status_code=400, content={"success": False, "message": "Нет данных"})
+    
+    try:
+        with open("content.json", "w", encoding="utf-8") as f:
+            json.dump(new_content, f, ensure_ascii=False, indent=4)
+        return JSONResponse(content={"success": True, "message": "Сохранено!"})
+    except Exception as e:
+        logger.error(f"Error saving content: {e}")
+        return JSONResponse(status_code=500, content={"success": False, "message": "Ошибка сервера при сохранении"})
+
+# Mount root last to serve any other static files
+app.mount("/", StaticFiles(directory=".", html=True), name="site")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
-# Mount root last to serve any other static files (like templates)
-app.mount("/", StaticFiles(directory=".", html=True), name="site")

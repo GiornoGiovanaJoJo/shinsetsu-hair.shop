@@ -250,17 +250,12 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = true;
             btn.textContent = '...';
 
-            // Convert to JSON for simple text form
             const formData = new FormData(footerForm);
-            const data = Object.fromEntries(formData.entries());
 
             try {
                 const response = await fetch('/api/callback', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
 
                 if (response.ok) {

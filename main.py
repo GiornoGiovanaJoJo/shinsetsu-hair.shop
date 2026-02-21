@@ -269,17 +269,13 @@ async def handle_calculate(
 
 @app.post("/api/callback")
 async def handle_callback(
-    name: str = Form(...),
     fullname: str = Form(...),
-    contact: str = Form(...),
     phone: str = Form(...)
 ):
     try:
         msg = (
             f"📞 <b>Заказ обратного звонка!</b>\n\n"
-            f"👤 Имя: {name}\n"
-            f"📝 ФИО: {fullname}\n"
-            f"📱 Связь: {contact}\n"
+            f"👤 Имя/ФИО: {fullname}\n"
             f"☎️ Телефон: {phone}"
         )
         await bot.send_message(chat_id=TELEGRAM_ADMIN_CHAT_ID, text=msg, parse_mode=ParseMode.HTML)

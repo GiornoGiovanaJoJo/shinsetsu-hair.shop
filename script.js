@@ -19,6 +19,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Custom Modal Logic ---
+    const customModal = document.getElementById('customModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalText = document.getElementById('modalText');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+    const showModal = (title, text, isError = false) => {
+        modalTitle.textContent = title;
+        modalTitle.style.color = isError ? '#ff4444' : 'var(--color-pink)';
+        modalText.textContent = text;
+        customModal.classList.add('show');
+    };
+
+    const closeModal = () => {
+        customModal.classList.remove('show');
+    };
+
+    modalCloseBtn.addEventListener('click', closeModal);
+    customModal.addEventListener('click', (e) => {
+        if (e.target === customModal) closeModal();
+    });
+
     // --- Calculator Logic ---
     const photoInputs = document.querySelectorAll('.photo-input');
 
@@ -183,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                alert('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.');
+                showModal('Успешно!', 'Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.');
                 calcForm.reset();
                 // Reset previews
                 document.querySelectorAll('.photo-preview').forEach(img => {
@@ -193,11 +215,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 resultValue.textContent = '-';
             } else {
-                alert('Произошла ошибка при отправке. Попробуйте еще раз.');
+                showModal('Ошибка', 'Произошла ошибка при отправке. Попробуйте еще раз.', true);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Ошибка соединения с сервером.');
+            showModal('Ошибка', 'Ошибка соединения с сервером.', true);
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
@@ -259,10 +281,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    alert('Мы перезвоним вам в ближайшее время!');
+                    showModal('Заявка принята', 'Мы перезвоним вам в ближайшее время!');
                     footerForm.reset();
                 } else {
-                    alert('Ошибка отправки.');
+                    showModal('Ошибка', 'Ошибка отправки.', true);
                 }
             } catch (error) {
                 console.error('Error:', error);

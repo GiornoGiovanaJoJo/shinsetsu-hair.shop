@@ -162,17 +162,15 @@ Sitemap: https://shinsetsu-hair.shop/sitemap.xml"""
 
 @app.get("/sitemap.xml", response_class=Response)
 async def generate_sitemap():
-    content = """<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>https://shinsetsu-hair.shop/volosy-slavyanskie-60sm/</loc><priority>0.8</priority></url>
-<url><loc>https://shinsetsu-hair.shop/volosy-evropeyskie-50sm/</loc><priority>0.7</priority></url>
+    content = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>https://shinsetsu-hair.shop/</loc><priority>1.0</priority></url>
 </urlset>"""
     return Response(content=content, media_type="application/xml")
 
-@app.get("/{product_slug}/", response_class=Response)
-async def product_page(product_slug: str):
-    if product_slug in ["volosy-slavyanskie-60sm", "volosy-evropeyskie-50sm"]:
-        return FileResponse("product.html")
-    raise HTTPException(status_code=404, detail="Product not found")
+@app.exception_handler(404)
+async def custom_404_handler(request, exc):
+    return JSONResponse(status_code=404, content={"message": "Страница не найдена. Пожалуйста, вернитесь на главную: https://shinsetsu-hair.shop/"})
 
 @app.get("/yandex_6407bd5a232ac6e8.html", response_class=Response)
 async def read_yandex_verification():

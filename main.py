@@ -171,7 +171,6 @@ async def read_script():
 async def read_robots():
     content = """User-agent: * 
 Allow: /
-Disallow: /admin/
 Disallow: /cart/
 Sitemap: https://shinsetsu-hair.shop/sitemap.xml"""
     return Response(content=content, media_type="text/plain")
@@ -334,34 +333,7 @@ async def echo_handler(message: types.Message):
 async def on_startup():
     asyncio.create_task(dp.start_polling(bot))
 
-# --- Admin Routes ---
-@app.get("/admin", tags=["Admin"])
-async def read_admin(request: Request):
-    """Returns the Admin Panel HTML interface."""
-    content = get_content()
-    return templates.TemplateResponse("admin.html", {"request": request, "content": content})
 
-class AdminSaveRequest(BaseModel):
-    secret_key: str
-    content: Dict[str, Any]
-
-@app.post("/admin/save", tags=["Admin"])
-async def save_admin(payload: AdminSaveRequest):
-    """Saves updated JSON content from the Admin panel."""
-    if payload.secret_key != "Nikitoso02-":
-        return JSONResponse(status_code=403, content={"success": False, "message": "Неверный секретный ключ!"})
-    
-    new_content = payload.content
-    if not new_content:
-        return JSONResponse(status_code=400, content={"success": False, "message": "Нет данных"})
-    
-    try:
-        with open("content.json", "w", encoding="utf-8") as f:
-            json.dump(new_content, f, ensure_ascii=False, indent=4)
-        return JSONResponse(content={"success": True, "message": "Сохранено!"})
-    except Exception as e:
-        logger.error(f"Error saving content: {e}")
-        return JSONResponse(status_code=500, content={"success": False, "message": "Ошибка сервера при сохранении"})
 
 # Mount root last to serve any other static files
 app.mount("/", StaticFiles(directory=".", html=True), name="site")

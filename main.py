@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # --- Configuration (Hardcoded as requested) ---
 TELEGRAM_BOT_TOKEN = "8508276509:AAEJd40mw7ITW3dSOeGPCAj7e7janJINiRc"
-TELEGRAM_ADMIN_CHAT_ID = "8391275806"
+TELEGRAM_ADMIN_CHAT_IDS = ["8391275806", "1699147092"]
 
 # --- Calculator Logic (Ported) ---
 PRICE_TABLE = {
@@ -249,7 +249,11 @@ async def handle_calculate(
         )
         
         # Send text
-        await bot.send_message(chat_id=TELEGRAM_ADMIN_CHAT_ID, text=msg_text, parse_mode=ParseMode.HTML)
+        for admin_id in TELEGRAM_ADMIN_CHAT_IDS:
+            try:
+                await bot.send_message(chat_id=admin_id, text=msg_text, parse_mode=ParseMode.HTML)
+            except Exception as e:
+                logger.error(f"Failed to send message to admin {admin_id}: {e}")
         
         # Send photos
         if photo_paths:
@@ -259,7 +263,11 @@ async def handle_calculate(
                 media_group.append(types.InputMediaPhoto(media=FSInputFile(path_)))
             
             if media_group:
-                await bot.send_media_group(chat_id=TELEGRAM_ADMIN_CHAT_ID, media=media_group)
+                for admin_id in TELEGRAM_ADMIN_CHAT_IDS:
+                    try:
+                        await bot.send_media_group(chat_id=admin_id, media=media_group)
+                    except Exception as e:
+                        logger.error(f"Failed to send media group to admin {admin_id}: {e}")
 
         return JSONResponse(content={"success": True, "price": price, "message": "Расчет отправлен"})
 
@@ -278,7 +286,11 @@ async def handle_callback(
             f"👤 Имя/ФИО: {fullname}\n"
             f"☎️ Телефон: {phone}"
         )
-        await bot.send_message(chat_id=TELEGRAM_ADMIN_CHAT_ID, text=msg, parse_mode=ParseMode.HTML)
+        for admin_id in TELEGRAM_ADMIN_CHAT_IDS:
+            try:
+                await bot.send_message(chat_id=admin_id, text=msg, parse_mode=ParseMode.HTML)
+            except Exception as e:
+                logger.error(f"Failed to send callback to admin {admin_id}: {e}")
         return JSONResponse(content={"success": True, "message": "Заявка принята"})
     except Exception as e:
         logger.error(f"Error in callback: {e}")
@@ -296,7 +308,11 @@ async def echo_handler(message: types.Message):
         await message.answer("Привет! Я бот Shinsetsu Hair. Оставьте заявку на сайте, и мы свяжемся с вами!")
     else:
         # Forward user messages to admin just in case
-        await bot.forward_message(chat_id=TELEGRAM_ADMIN_CHAT_ID, from_chat_id=message.chat.id, message_id=message.message_id)
+        for admin_id in TELEGRAM_ADMIN_CHAT_IDS:
+            try:
+                await bot.forward_message(chat_id=admin_id, from_chat_id=message.chat.id, message_id=message.message_id)
+            except Exception as e:
+                logger.error(f"Failed to forward message to admin {admin_id}: {e}")
         await message.answer("Ваше сообщение передано администратору.")
 
 # --- Startup ---

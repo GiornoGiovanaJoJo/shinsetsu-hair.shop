@@ -365,7 +365,7 @@ ul {
 
 .hero__badge {
     position: absolute;
-    top: 100px;
+    top: 30%;
     right: clamp(1rem, 4vw, 40px);
     display: inline-flex;
     align-items: center;
@@ -388,7 +388,7 @@ ul {
 .hero__title {
     font-family: 'Belepotan', serif;
     font-weight: 600;
-    font-size: clamp(1.6rem, 3.8vw, 48px);
+    font-size: clamp(2rem, 5vw, 64px);
     line-height: 1.1;
     margin-bottom: 1rem;
     text-transform: uppercase;
@@ -397,7 +397,7 @@ ul {
 }
 
 .hero__subtitle {
-    font-size: clamp(1rem, 2vw, 18px);
+    font-size: clamp(1.2rem, 2.5vw, 34px);
     color: rgba(255, 255, 255, 0.9);
     max-width: 500px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);

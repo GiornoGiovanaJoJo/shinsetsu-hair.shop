@@ -364,7 +364,9 @@ ul {
 }
 
 .hero__badge {
-    position: relative;
+    position: absolute;
+    top: 100px;
+    right: clamp(1rem, 4vw, 40px);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -372,9 +374,9 @@ ul {
     border: 1px solid var(--color-pink);
     font-size: clamp(10px, 2vw, 12px);
     text-transform: uppercase;
-    margin-bottom: 1.5rem;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
+    z-index: 3;
 }
 
 .hero__badge-accent {
@@ -398,14 +400,8 @@ ul {
     font-size: clamp(1rem, 2vw, 18px);
     color: rgba(255, 255, 255, 0.9);
     max-width: 500px;
-    margin: 0 auto;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-@media (min-width: 1024px) {
-    .hero__subtitle {
-        margin: 0 auto;
-    }
+    text-align: left;
 }
 
 /* =============================================

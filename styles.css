@@ -375,8 +375,6 @@ ul {
     margin-bottom: 1.5rem;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
-    float: left;
-    clear: both;
 }
 
 .hero__badge-accent {

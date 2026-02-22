@@ -1,7 +1,6 @@
 User-agent: *
-Disallow: /fonts/
+Allow: /
 Disallow: /uploads/
-Disallow: /deploy.sh
-Disallow: /main.py
+Disallow: /cart/
 
 Sitemap: https://shinsetsu-hair.shop/sitemap.xml

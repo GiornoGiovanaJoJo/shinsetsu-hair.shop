@@ -1,33 +1,49 @@
 #!/bin/bash
 
 # ==========================================
-# Скрипт для ручного или автоматического деплоя
+# Деплой shinsetsu-hair.shop
 # ==========================================
 
-# Переходим в директорию проекта
-# Замените на реальный путь, где лежит проект на сервере
-PROJECT_DIR="/var/www/shinsetsu-hair.shop"
-cd $PROJECT_DIR || exit
+set -e
 
-echo "Начинаем деплой..."
+PROJECT_DIR="/root/shinsetsu-hair"
 
-# 1. Получаем последние обновления из git
-echo "Стягиваем изменения из GitHub..."
-git pull origin main # или master
+echo "=== Деплой shinsetsu-hair.shop ==="
 
-# 2. Обновляем зависимости для Python
-echo "Обновляем зависимости Python..."
-# Если вы используете виртуальное окружение (рекомендуется):
-# source venv/bin/activate
-pip install -r requirements.txt
+# 1. Переход в директорию проекта
+cd "$PROJECT_DIR" || { echo "ОШИБКА: Директория $PROJECT_DIR не найдена!"; exit 1; }
+echo "✓ Директория: $PROJECT_DIR"
 
-# 3. Перезапускаем сервис
-# В зависимости от того, как вы запускаете приложение (uvicorn/fastapi)
-# Рекомендуемый способ в Linux - использовать systemd. 
-echo "Перезапускаем приложение..."
-# Расскомментируйте нужную строку:
+# 2. Разрешаем git операции
+git config --global --add safe.directory "$PROJECT_DIR" 2>/dev/null
 
-# Если через pm2 (рекомендуется):
-pm2 restart shinsetsu-hair
+# 3. Получаем последние обновления из git
+echo "→ Стягиваем изменения из GitHub..."
+git pull origin main
+echo "✓ Код обновлён"
 
-echo "Деплой успешно завершен!"
+# 4. Обновляем зависимости Python
+echo "→ Обновляем зависимости..."
+pip3 install --break-system-packages -r requirements.txt -q
+echo "✓ Зависимости установлены"
+
+# 5. Перезапускаем приложение
+echo "→ Перезапускаем приложение..."
+pkill -f "python3 main.py" 2>/dev/null || true
+sleep 1
+
+nohup python3 main.py > app.log 2>&1 &
+NEW_PID=$!
+sleep 3
+
+# 6. Проверяем, что приложение запустилось
+if kill -0 $NEW_PID 2>/dev/null; then
+    echo "✓ Приложение запущено (PID: $NEW_PID)"
+else
+    echo "✗ ОШИБКА: Приложение не запустилось!"
+    echo "Последние строки лога:"
+    tail -10 app.log
+    exit 1
+fi
+
+echo "=== Деплой завершён успешно! ==="

@@ -1,14 +1,12 @@
 import logging
 import os
 import json
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Form, UploadFile, File, HTTPException, Response, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
-import xml.etree.ElementTree as ET
-from datetime import datetime
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
 import asyncio
@@ -129,9 +127,19 @@ def calculate_price(length_str: str, color: str, structure: str) -> int:
         return 30000
 
 # --- App Setup ---
-app = FastAPI()
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 dp = Dispatcher()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    polling_task = asyncio.create_task(dp.start_polling(bot))
+    yield
+    # Shutdown
+    polling_task.cancel()
+    await bot.session.close()
+
+app = FastAPI(lifespan=lifespan)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="."), name="static")
@@ -191,8 +199,16 @@ async def custom_404_handler(request, exc):
 async def read_yandex_verification():
     return FileResponse("yandex_6407bd5a232ac6e8.html")
 
-@app.get("/deploy.js")  # Hide deploy script
-async def read_deploy():
+# Block access to sensitive server-side files
+SENSITIVE_FILES = [
+    "main.py", "deploy.sh", "content.json", "requirements.txt",
+    "app.log", ".env", "nginx.conf.template",
+]
+
+@app.get("/{filename}")
+async def block_sensitive_files(filename: str):
+    if filename in SENSITIVE_FILES or filename.endswith(('.py', '.sh', '.bak')):
+        raise HTTPException(status_code=404)
     raise HTTPException(status_code=404)
 
 @app.post("/api/calculate")
@@ -327,15 +343,6 @@ async def echo_handler(message: types.Message):
             except Exception as e:
                 logger.error(f"Failed to forward message to admin {admin_id}: {e}")
         await message.answer("Ваше сообщение передано администратору.")
-
-# --- Startup & Shutdown ---
-@app.on_event("startup")
-async def on_startup():
-    asyncio.create_task(dp.start_polling(bot))
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    await bot.session.close()
 
 
 

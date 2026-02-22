@@ -33,13 +33,26 @@ jobs:
           script: |
             cd /root/shinsetsu-hair
             
-            # Устанавливаем зависимости (если есть)
+            # Устанавливаем зависимости
             if [ -f "requirements.txt" ]; then
-                pip3 install -r requirements.txt --break-system-packages || pip install -r requirements.txt --break-system-packages
+                pip3 install --break-system-packages -r requirements.txt -q
             fi
             
-            # Перезапускаем FastAPI через pm2, чтобы избежать зависания SSH-сессии
-            echo "Restarting application via pm2..."
-            pm2 restart shinsetsu-hair || echo "PM2 restart failed, checking logs..."
+            # Перезапускаем FastAPI
+            echo "Restarting application..."
+            pkill -f "python3 main.py" || true
+            sleep 2
+            nohup python3 main.py > app.log 2>&1 &
+            sleep 3
+            
+            # Проверяем запуск
+            if pgrep -f "python3 main.py" > /dev/null; then
+                echo "✓ Application started successfully (PID: $(pgrep -f 'python3 main.py'))"
+            else
+                echo "✗ Application failed to start!"
+                tail -10 app.log
+                exit 1
+            fi
             
             echo "Deployment successful!"
+

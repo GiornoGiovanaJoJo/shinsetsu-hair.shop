@@ -353,15 +353,12 @@ ul {
     position: relative;
     z-index: 2;
     text-align: center;
-    /* Center on mobile */
     padding: 1rem;
     width: 100%;
 }
 
 @media (min-width: 1024px) {
     .hero__content {
-        text-align: left;
-        /* Left align on desktop */
         padding: 2rem 1rem;
     }
 }
@@ -378,6 +375,8 @@ ul {
     margin-bottom: 1.5rem;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
+    float: left;
+    clear: both;
 }
 
 .hero__badge-accent {
@@ -389,12 +388,12 @@ ul {
 .hero__title {
     font-family: 'Belepotan', serif;
     font-weight: 600;
-    font-size: clamp(2rem, 5vw, 64px);
+    font-size: clamp(1.6rem, 3.8vw, 48px);
     line-height: 1.1;
     margin-bottom: 1rem;
     text-transform: uppercase;
     text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    /* Improve readability */
+    text-align: left;
 }
 
 .hero__subtitle {
@@ -407,7 +406,7 @@ ul {
 
 @media (min-width: 1024px) {
     .hero__subtitle {
-        margin: 0 auto 0 0;
+        margin: 0 auto;
     }
 }
 

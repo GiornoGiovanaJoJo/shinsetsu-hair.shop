@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 # --- Configuration (Hardcoded as requested) ---
 TELEGRAM_BOT_TOKEN = "8508276509:AAEJd40mw7ITW3dSOeGPCAj7e7janJINiRc"
-TELEGRAM_ADMIN_CHAT_IDS = ["8391275806", "1699147092"]
+TELEGRAM_ADMIN_CHAT_IDS = ["8391275806", "1699147092", "482851314", "192647832", "7246811943"]
 
 # --- Calculator Logic (Ported) ---
 PRICE_TABLE = {

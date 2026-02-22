@@ -360,8 +360,8 @@ ul {
 
 @media (min-width: 1024px) {
     .hero__content {
-        text-align: right;
-        /* Right align on desktop */
+        text-align: left;
+        /* Left align on desktop */
         padding: 2rem 1rem;
     }
 }
@@ -407,7 +407,7 @@ ul {
 
 @media (min-width: 1024px) {
     .hero__subtitle {
-        margin: 0 0 0 auto;
+        margin: 0 auto 0 0;
     }
 }
 

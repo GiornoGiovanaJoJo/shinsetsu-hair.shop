@@ -294,4 +294,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- Background Music ---
+    const bgMusic = document.getElementById('bgMusic');
+    if (bgMusic) {
+        bgMusic.volume = 0.2; // Comfortable volume
+
+        // Attempt to play immediately
+        const tryPlayMusic = () => {
+            bgMusic.play().then(() => {
+                // Success: remove listeners
+                document.removeEventListener('click', tryPlayMusic);
+                document.removeEventListener('touchstart', tryPlayMusic);
+                document.removeEventListener('scroll', tryPlayMusic);
+            }).catch(() => {
+                // Autoplay prevented by browser, will try on next interaction
+            });
+        };
+
+        tryPlayMusic();
+
+        // Listeners for user interaction to bypass autoplay restrictions
+        document.addEventListener('click', tryPlayMusic);
+        document.addEventListener('touchstart', tryPlayMusic);
+        document.addEventListener('scroll', tryPlayMusic, { once: true });
+    }
 });

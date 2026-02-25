@@ -297,19 +297,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Background Music ---
     const bgMusic = document.getElementById('bgMusic');
+    const muteBtn = document.getElementById('muteBtn');
+    const iconUnmuted = document.getElementById('icon-unmuted');
+    const iconMuted = document.getElementById('icon-muted');
+
     if (bgMusic) {
         bgMusic.volume = 0.1; // Comfortable volume
 
         // Attempt to play immediately
         const tryPlayMusic = () => {
-            bgMusic.play().then(() => {
-                // Success: remove listeners
-                document.removeEventListener('click', tryPlayMusic);
-                document.removeEventListener('touchstart', tryPlayMusic);
-                document.removeEventListener('scroll', tryPlayMusic);
-            }).catch(() => {
-                // Autoplay prevented by browser, will try on next interaction
-            });
+            if (bgMusic.paused) {
+                bgMusic.play().then(() => {
+                    // Success: remove listeners
+                    document.removeEventListener('click', tryPlayMusic);
+                    document.removeEventListener('touchstart', tryPlayMusic);
+                    document.removeEventListener('scroll', tryPlayMusic);
+                }).catch(() => {
+                    // Autoplay prevented by browser, will try on next interaction
+                });
+            }
         };
 
         tryPlayMusic();
@@ -318,5 +324,24 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('click', tryPlayMusic);
         document.addEventListener('touchstart', tryPlayMusic);
         document.addEventListener('scroll', tryPlayMusic, { once: true });
+
+        // Mute toggle logic
+        if (muteBtn) {
+            muteBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent tryPlayMusic from catching this click
+
+                if (bgMusic.muted) {
+                    bgMusic.muted = false;
+                    iconUnmuted.style.display = 'block';
+                    iconMuted.style.display = 'none';
+                    if (bgMusic.paused) tryPlayMusic();
+                } else {
+                    bgMusic.muted = true;
+                    iconUnmuted.style.display = 'none';
+                    iconMuted.style.display = 'block';
+                }
+            });
+        }
     }
 });

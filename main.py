@@ -110,6 +110,7 @@ def calculate_price(length_str: str, color: str, structure: str) -> int:
             'straight': 'славянка', # HTML Label: "Прямые"
             'wavy': 'среднее',      # HTML Label: "Волнистые"
             'curly': 'густые',      # HTML Label: "Кудрявые" -> Backend 'густые'
+            'asian': 'среднее',     # Map Asian to Average for dummy price
             # Legacy/Cyrillic fallbacks
             'славянка': 'славянка',
             'среднее': 'среднее',
@@ -220,9 +221,7 @@ async def block_sensitive_files(filename: str):
 
 @app.post("/api/calculate")
 async def handle_calculate(
-    length: str = Form(...),
-    color: str = Form(...),
-    structure: str = Form(...),
+    condition: str = Form(...),
     name: str = Form(...),
     phone: str = Form(...),
     city: str = Form(...),
@@ -253,6 +252,13 @@ async def handle_calculate(
         }
         display_structure = struct_map.get(structure.lower(), structure).capitalize()
 
+        condition_map = {
+            'slavic': 'славянские',
+            'european': 'европейские',
+            'asian': 'азиатские'
+        }
+        display_condition = condition_map.get(condition.lower(), condition).capitalize()
+
         # Calculate Price
         price = calculate_price(length, color, structure)
         
@@ -274,6 +280,7 @@ async def handle_calculate(
             f"📏 Длина: {length}\n"
             f"🎨 Цвет: {display_color}\n"
             f"💇 Структура: {display_structure}\n"
+            f"🧬 Тип: {display_condition}\n"
             f"💵 <b>Оценка: ~{price} ₽</b>\n\n"
             f"<b>Контакты:</b>\n"
             f"👤 ФИО: {name}\n"

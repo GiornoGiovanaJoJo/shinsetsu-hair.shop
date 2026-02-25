@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Background Music ---
     const bgMusic = document.getElementById('bgMusic');
     if (bgMusic) {
-        bgMusic.volume = 0.2; // Comfortable volume
+        bgMusic.volume = 0.1; // Comfortable volume
 
         // Attempt to play immediately
         const tryPlayMusic = () => {

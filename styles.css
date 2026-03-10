@@ -280,7 +280,7 @@ ul {
 }
 
 .header__logo-img {
-    height: clamp(24px, 5vw, 32px);
+    height: clamp(40px, 8vw, 60px);
     width: auto;
     object-fit: contain;
     display: inline-block;

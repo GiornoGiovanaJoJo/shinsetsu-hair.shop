@@ -12,7 +12,7 @@
 
     <!-- PRELOAD CRITICAL RESOURCES -->
     <link rel="preload" href="templates/Header.webp" as="image" type="image/webp">
-    <link rel="preload" href="templates/logo.png" as="image" type="image/png">
+    <link rel="preload" href="templates/logo.webp" as="image" type="image/webp">
     <link rel="preload" href="styles.css?v=2.0" as="style">
     <link rel="preload" href="fonts/LT_superior/LTSuperiorRegular.otf" as="font" type="font/otf" crossorigin>
     <link rel="preload" href="fonts/Belepotan/BelepotanRus.otf" as="font" type="font/otf" crossorigin>
@@ -176,8 +176,11 @@
             </div>
 
             <a href="#" class="header__logo" aria-label="На главную">
-                <img src="templates/logo.png" alt="Shinsetsu Hair" class="header__logo-img" width="200" height="60"
-                    fetchpriority="high" decoding="async">
+                <picture>
+                    <source srcset="templates/logo.webp" type="image/webp">
+                    <img src="templates/logo.png" alt="Shinsetsu Hair" class="header__logo-img" width="200" height="60"
+                        fetchpriority="high" decoding="async">
+                </picture>
             </a>
 
             <a href="#calculator" class="header__cta">Оценить волосы</a>
@@ -200,6 +203,8 @@
     <section class="hero" id="hero">
         <div class="hero__bg">
             <picture>
+                <source srcset="templates/source/0154c082df0cf5356c0f99d67ccc469f8574a6be.webp"
+                    media="(max-width: 767px)" type="image/webp">
                 <source srcset="templates/source/0154c082df0cf5356c0f99d67ccc469f8574a6be.png"
                     media="(max-width: 767px)">
                 <source srcset="templates/Header.webp" type="image/webp">

@@ -10,6 +10,13 @@
         content="продать волосы, сдать волосы, скупка волос, продать натуральные волосы, продать волосы москва, скупка натуральных волос">
     <link rel="icon" type="image/png" href="templates/logo.png">
 
+    <!-- PRELOAD CRITICAL RESOURCES -->
+    <link rel="preload" href="templates/Header.webp" as="image" type="image/webp">
+    <link rel="preload" href="templates/logo.png" as="image" type="image/png">
+    <link rel="preload" href="styles.css?v=2.0" as="style">
+    <link rel="preload" href="fonts/LT_superior/LTSuperiorRegular.otf" as="font" type="font/otf" crossorigin>
+    <link rel="preload" href="fonts/Belepotan/BelepotanRus.otf" as="font" type="font/otf" crossorigin>
+
     <!-- Schema.org Markup for Local Business -->
     <script type="application/ld+json">
     {
@@ -168,8 +175,9 @@
                 </button>
             </div>
 
-            <a href="#" class="header__logo">
-                <img src="templates/logo.png" alt="Shinsetsu Hair" class="header__logo-img">
+            <a href="#" class="header__logo" aria-label="На главную">
+                <img src="templates/logo.png" alt="Shinsetsu Hair" class="header__logo-img" width="200" height="60"
+                    fetchpriority="high" decoding="async">
             </a>
 
             <a href="#calculator" class="header__cta">Оценить волосы</a>
@@ -195,7 +203,8 @@
                 <source srcset="templates/source/0154c082df0cf5356c0f99d67ccc469f8574a6be.png"
                     media="(max-width: 767px)">
                 <source srcset="templates/Header.webp" type="image/webp">
-                <img src="templates/Header.webp" alt="Скупка натуральных волос" class="hero__image">
+                <img src="templates/Header.webp" alt="Скупка натуральных волос" class="hero__image" width="1920"
+                    height="1080" fetchpriority="high" decoding="async">
             </picture>
             <div class="hero__overlay"></div>
         </div>
@@ -359,7 +368,7 @@
                     <picture>
                         <source srcset="templates/Rectangle%20460.webp" type="image/webp">
                         <img src="templates/Rectangle%20460.png" alt="Продать натуральные волосы онлайн"
-                            class="calculator__mascot" loading="lazy">
+                            class="calculator__mascot" loading="lazy" width="420" height="860" decoding="async">
                     </picture>
                 </div>
             </div>
@@ -391,10 +400,11 @@
                     <picture>
                         <source srcset="templates/Image-2.webp" type="image/webp">
                         <img src="templates/Image-2.png" itemprop="image" alt="Славянские волосы прямые"
-                            class="example-card__img" loading="lazy">
+                            class="example-card__img" loading="lazy" width="300" height="400" decoding="async">
                     </picture>
                     <img src="templates/source/photo_2026-02-22_16-54-56.jpg"
-                        alt="Славянские волосы прямые — реальное фото" class="example-card__img-hover" loading="lazy">
+                        alt="Славянские волосы прямые — реальное фото" class="example-card__img-hover" loading="lazy"
+                        width="300" height="400" decoding="async">
                     <div class="example-card__content">
                         <div class="example-card__label" itemprop="name">СЛАВЯНСКАЯ ПРЯМАЯ СТРУКТУРА</div>
                         <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="example-card__price">
@@ -407,10 +417,10 @@
                     <picture>
                         <source srcset="templates/Image-1.webp" type="image/webp">
                         <img src="templates/Image-1.png" itemprop="image" alt="Славянские волосы волнистые"
-                            class="example-card__img" loading="lazy">
+                            class="example-card__img" loading="lazy" width="300" height="400" decoding="async">
                     </picture>
                     <img src="templates/source/photo_2026-02-22_16-57-46.jpg" alt="Волнистые волосы — реальное фото"
-                        class="example-card__img-hover" loading="lazy">
+                        class="example-card__img-hover" loading="lazy" width="300" height="400" decoding="async">
                     <div class="example-card__content">
                         <div class="example-card__label" itemprop="name">ВОЛНИСТАЯ СТРУКТУРА</div>
                         <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="example-card__price">
@@ -423,10 +433,10 @@
                     <picture>
                         <source srcset="templates/Image.webp" type="image/webp">
                         <img src="templates/Image.png" itemprop="image" alt="Кудрявые волосы для наращивания"
-                            class="example-card__img" loading="lazy">
+                            class="example-card__img" loading="lazy" width="300" height="400" decoding="async">
                     </picture>
                     <img src="templates/source/photo_2026-02-22_16-59-25.jpg" alt="Кудрявые волосы — реальное фото"
-                        class="example-card__img-hover" loading="lazy">
+                        class="example-card__img-hover" loading="lazy" width="300" height="400" decoding="async">
                     <div class="example-card__content">
                         <div class="example-card__label" itemprop="name">КУДРЯВЫЕ ВОЛОСЫ</div>
                         <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="example-card__price">
@@ -635,7 +645,8 @@
         <div class="cta-banner__bg">
             <picture>
                 <source srcset="templates/Background.webp" type="image/webp">
-                <img src="templates/Background.png" alt="Продать волосы" class="cta-banner__img" loading="lazy">
+                <img src="templates/Background.png" alt="Продать волосы" class="cta-banner__img" loading="lazy"
+                    width="1920" height="600" decoding="async">
             </picture>
             <div class="cta-banner__overlay"></div>
         </div>
@@ -716,7 +727,7 @@
         </div>
     </footer>
 
-    <script src="script.js?v=1.3"></script>
+    <script src="script.js?v=1.3" defer></script>
 
     <!-- Background Music -->
     <audio id="bgMusic" src="templates/arigato%20loop%20(online-audio-converter.com).mp3" loop preload="auto"></audio>

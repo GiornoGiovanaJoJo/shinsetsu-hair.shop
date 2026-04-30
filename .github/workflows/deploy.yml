@@ -38,27 +38,19 @@ jobs:
                 pip3 install --break-system-packages -r requirements.txt -q
             fi
             
-            # Останавливаем старый процесс через PID-файл
-            echo "Restarting application..."
-            if [ -f app.pid ]; then
-                OLD_PID=$(cat app.pid)
-                kill "$OLD_PID" 2>/dev/null || true
-                sleep 2
-                rm -f app.pid
-            fi
-            
-            # Запускаем FastAPI и сохраняем PID
-            nohup python3 main.py > app.log 2>&1 < /dev/null &
-            echo $! > app.pid
-            disown
+            # Устанавливаем и перезапускаем systemd-сервис
+            cp shinsetsu-hair.service /etc/systemd/system/shinsetsu-hair.service
+            systemctl daemon-reload
+            systemctl enable shinsetsu-hair
+            systemctl restart shinsetsu-hair
             sleep 3
             
             # Проверяем запуск
-            if [ -f app.pid ] && kill -0 $(cat app.pid) 2>/dev/null; then
-                echo "✓ Application started successfully (PID: $(cat app.pid))"
+            if systemctl is-active --quiet shinsetsu-hair; then
+                echo "✓ Application started successfully via systemd"
             else
                 echo "✗ Application failed to start!"
-                tail -10 app.log
+                journalctl -u shinsetsu-hair --no-pager -n 20
                 exit 1
             fi
             

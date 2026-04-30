@@ -27,22 +27,23 @@ echo "→ Обновляем зависимости..."
 pip3 install --break-system-packages -r requirements.txt -q
 echo "✓ Зависимости установлены"
 
-# 5. Перезапускаем приложение
-echo "→ Перезапускаем приложение..."
-pkill -f "python3 main.py" 2>/dev/null || true
-sleep 1
+# 5. Устанавливаем и перезапускаем systemd-сервис
+echo "→ Настраиваем systemd-сервис..."
+cp shinsetsu-hair.service /etc/systemd/system/shinsetsu-hair.service
+systemctl daemon-reload
+systemctl enable shinsetsu-hair
 
-nohup python3 main.py > app.log 2>&1 &
-NEW_PID=$!
+echo "→ Перезапускаем приложение..."
+systemctl restart shinsetsu-hair
 sleep 3
 
 # 6. Проверяем, что приложение запустилось
-if kill -0 $NEW_PID 2>/dev/null; then
-    echo "✓ Приложение запущено (PID: $NEW_PID)"
+if systemctl is-active --quiet shinsetsu-hair; then
+    echo "✓ Приложение запущено через systemd"
 else
     echo "✗ ОШИБКА: Приложение не запустилось!"
     echo "Последние строки лога:"
-    tail -10 app.log
+    journalctl -u shinsetsu-hair --no-pager -n 10
     exit 1
 fi
 

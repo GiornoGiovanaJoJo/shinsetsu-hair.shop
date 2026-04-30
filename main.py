@@ -221,6 +221,9 @@ async def block_sensitive_files(filename: str):
 
 @app.post("/api/calculate")
 async def handle_calculate(
+    length: str = Form(...),
+    color: str = Form(...),
+    structure: str = Form(...),
     condition: str = Form(...),
     name: str = Form(...),
     phone: str = Form(...),

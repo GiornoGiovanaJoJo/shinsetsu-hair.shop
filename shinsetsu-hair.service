@@ -1,0 +1,16 @@
+[Unit]
+Description=Shinsetsu Hair FastAPI Application
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/shinsetsu-hair
+ExecStart=/usr/bin/python3 main.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/root/shinsetsu-hair/app.log
+StandardError=append:/root/shinsetsu-hair/app.log
+
+[Install]
+WantedBy=multi-user.target

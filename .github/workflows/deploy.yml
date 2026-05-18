@@ -32,6 +32,13 @@ jobs:
           port: 22
           script: |
             cd /root/shinsetsu-hair
+
+            # Останавливаем старые процессы (конфликт порта / Telegram polling)
+            systemctl stop shinsetsu-hair 2>/dev/null || true
+            pkill -f "python3 main.py" 2>/dev/null || true
+            pkill -f "uvicorn main:app" 2>/dev/null || true
+            if command -v fuser >/dev/null 2>&1; then fuser -k 8000/tcp 2>/dev/null || true; fi
+            sleep 2
             
             # Устанавливаем зависимости
             if [ -f "requirements.txt" ]; then
@@ -42,20 +49,26 @@ jobs:
             cp shinsetsu-hair.service /etc/systemd/system/shinsetsu-hair.service
             systemctl daemon-reload
             systemctl enable shinsetsu-hair
-            systemctl restart shinsetsu-hair
-            sleep 3
+            systemctl start shinsetsu-hair
             
-            # Проверяем запуск
-            if systemctl is-active --quiet shinsetsu-hair; then
-                echo "✓ Application started successfully via systemd"
-            else
-                echo "✗ Application failed to start!"
-                journalctl -u shinsetsu-hair --no-pager -n 20
-                exit 1
+            echo "→ Waiting for application..."
+            READY=0
+            for i in 1 2 3 4 5 6 7 8 9 10; do
+              sleep 2
+              if curl -sf http://127.0.0.1:8000/ >/dev/null 2>&1; then
+                READY=1
+                break
+              fi
+            done
+            if [ "$READY" -ne 1 ]; then
+              echo "✗ Application failed to start!"
+              journalctl -u shinsetsu-hair --no-pager -n 30
+              tail -30 /root/shinsetsu-hair/app.log 2>/dev/null || true
+              exit 1
             fi
+            echo "✓ Application is responding"
 
             echo "→ Smoke test /api/calculate..."
-            sleep 2
             RESPONSE=$(curl -sf -X POST http://127.0.0.1:8000/api/calculate \
               -F "color=blonde" \
               -F "length=50-60" \
@@ -67,6 +80,7 @@ jobs:
             echo "$RESPONSE" | grep -q '"success":true' || {
               echo "✗ Smoke test failed: $RESPONSE"
               journalctl -u shinsetsu-hair --no-pager -n 30
+              tail -30 /root/shinsetsu-hair/app.log 2>/dev/null || true
               exit 1
             }
             echo "✓ Smoke test passed"

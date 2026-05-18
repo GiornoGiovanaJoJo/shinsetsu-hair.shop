@@ -166,15 +166,9 @@ def schedule_telegram(coro) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    polling_task = asyncio.create_task(dp.start_polling(bot))
+    # Polling отключён: на сервере несколько воркеров вызывали TelegramConflictError.
+    # Для заявок с сайта достаточно bot.send_message / send_media_group.
     yield
-    # Shutdown
-    polling_task.cancel()
-    try:
-        await polling_task
-    except asyncio.CancelledError:
-        pass
     try:
         await bot.session.close()
     except Exception:

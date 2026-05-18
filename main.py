@@ -2,7 +2,7 @@ import logging
 import os
 import json
 import uuid
-from typing import Optional, List
+from typing import Optional, List, Union
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Form, UploadFile, File, HTTPException, Response, Request
 from fastapi.staticfiles import StaticFiles
@@ -257,9 +257,12 @@ async def handle_calculate(
     city: str = Form(...),
     email: Optional[str] = Form(None),
     message: Optional[str] = Form(None),
-    photos: Optional[List[UploadFile]] = File(None),
+    photos: Union[List[UploadFile], UploadFile, None] = File(None),
 ):
     try:
+        uploaded_photos: List[UploadFile] = []
+        if photos is not None:
+            uploaded_photos = photos if isinstance(photos, list) else [photos]
         # 1. Logic (Normalization) - kept same
         # ... (Duplicate logic for mapping to ensure we have keys) ...
         # Ideally, we should refactor calculate_price to return normalized keys too, 
@@ -294,8 +297,8 @@ async def handle_calculate(
         
         # Save photos
         photo_paths = []
-        if photos:
-            for photo in photos:
+        if uploaded_photos:
+            for photo in uploaded_photos:
                 if photo.filename:
                     ext = os.path.splitext(photo.filename)[1] or ".jpg"
                     safe_name = f"{uuid.uuid4().hex}{ext}"

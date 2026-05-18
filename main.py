@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
+from aiogram.client.session.aiohttp import AiohttpSession
 import asyncio
 
 # Configure logging
@@ -18,6 +19,8 @@ logger = logging.getLogger(__name__)
 # --- Configuration (Hardcoded as requested) ---
 TELEGRAM_BOT_TOKEN = "8508276509:AAEJd40mw7ITW3dSOeGPCAj7e7janJINiRc"
 TELEGRAM_ADMIN_CHAT_IDS = ["8391275806", "1699147092", "482851314", "192647832", "7246811943"]
+# SOCKS5 proxy (Германия) — обход блокировки api.telegram.org на сервере
+TELEGRAM_PROXY = "socks5://qJ3u0v:cLcHk7@196.19.10.162:8000"
 
 # --- Calculator Logic (Ported) ---
 PRICE_TABLE = {
@@ -128,7 +131,8 @@ def calculate_price(length_str: str, color: str, structure: str) -> int:
         return 30000
 
 # --- App Setup ---
-bot = Bot(token=TELEGRAM_BOT_TOKEN)
+telegram_session = AiohttpSession(proxy=TELEGRAM_PROXY)
+bot = Bot(token=TELEGRAM_BOT_TOKEN, session=telegram_session)
 dp = Dispatcher()
 
 @asynccontextmanager
@@ -221,6 +225,9 @@ async def block_sensitive_files(filename: str):
 
 @app.post("/api/calculate")
 async def handle_calculate(
+    color: str = Form(...),
+    length: str = Form(...),
+    structure: str = Form(...),
     condition: str = Form(...),
     name: str = Form(...),
     phone: str = Form(...),

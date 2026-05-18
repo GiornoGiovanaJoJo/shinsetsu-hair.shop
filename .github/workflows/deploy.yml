@@ -30,15 +30,10 @@ jobs:
           username: root
           password: Nikitoso02-
           port: 22
+          command_timeout: 10m
           script: |
             cd /root/shinsetsu-hair
-
-            # Останавливаем старые процессы (конфликт порта / Telegram polling)
-            systemctl stop shinsetsu-hair 2>/dev/null || true
-            pkill -f "python3 main.py" 2>/dev/null || true
-            pkill -f "uvicorn main:app" 2>/dev/null || true
-            if command -v fuser >/dev/null 2>&1; then fuser -k 8000/tcp 2>/dev/null || true; fi
-            sleep 2
+            mkdir -p uploads
             
             # Устанавливаем зависимости
             if [ -f "requirements.txt" ]; then
@@ -49,7 +44,7 @@ jobs:
             cp shinsetsu-hair.service /etc/systemd/system/shinsetsu-hair.service
             systemctl daemon-reload
             systemctl enable shinsetsu-hair
-            systemctl start shinsetsu-hair
+            systemctl restart shinsetsu-hair
             
             echo "→ Waiting for application..."
             READY=0

@@ -89,6 +89,15 @@ jobs:
               exit 1
             }
             echo "✓ Smoke test passed"
+
+            echo "→ Updating nginx upload limits..."
+            if [ -f nginx.conf.template ] && command -v nginx >/dev/null 2>&1; then
+              cp nginx.conf.template /etc/nginx/sites-available/shinsetsu-hair.shop
+              ln -sf /etc/nginx/sites-available/shinsetsu-hair.shop /etc/nginx/sites-enabled/shinsetsu-hair.shop
+              nginx -t && systemctl reload nginx && echo "✓ nginx reloaded"
+            else
+              echo "⚠ nginx config skipped (nginx not found or template missing)"
+            fi
             
             echo "Deployment successful!"
 

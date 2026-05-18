@@ -1,3 +1,52 @@
+/** Сжимает фото перед отправкой (лимит nginx / мобильный интернет) */
+const compressImageForUpload = (file, maxWidth = 1600, quality = 0.82) => {
+    if (!file || !file.type.startsWith('image/')) {
+        return Promise.resolve(file);
+    }
+    if (file.size < 400 * 1024) {
+        return Promise.resolve(file);
+    }
+
+    return new Promise((resolve) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            let { width, height } = img;
+            if (width > maxWidth) {
+                height = Math.round(height * (maxWidth / width));
+                width = maxWidth;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                resolve(file);
+                return;
+            }
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob) {
+                        resolve(file);
+                        return;
+                    }
+                    const name = (file.name || 'photo.jpg').replace(/\.[^.]+$/, '') + '.jpg';
+                    resolve(new File([blob], name, { type: 'image/jpeg', lastModified: Date.now() }));
+                },
+                'image/jpeg',
+                quality
+            );
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            resolve(file);
+        };
+        img.src = url;
+    });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- Mobile Navigation ---
     const burger = document.getElementById('burger');
@@ -184,19 +233,17 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.textContent = 'ОТПРАВКА...';
 
         const formData = new FormData(calcForm);
-
-        // Manually append photos to the 'photos' list expected by FastAPI
-        const photoInputs = calcForm.querySelectorAll('input[type="file"]');
-        photoInputs.forEach(input => {
-            if (input.files[0]) {
-                formData.append('photos', input.files[0]);
-            }
-        });
-
-        // Remove individual photo fields if they confuse the backend (optional, but cleaner)
         formData.delete('photo1');
         formData.delete('photo2');
         formData.delete('photo3');
+
+        const fileInputs = calcForm.querySelectorAll('input[type="file"]');
+        for (const input of fileInputs) {
+            if (input.files[0]) {
+                const compressed = await compressImageForUpload(input.files[0]);
+                formData.append('photos', compressed);
+            }
+        }
 
         try {
             const response = await fetch('/api/calculate', {
@@ -214,6 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     img.parentElement.querySelector('.photo-upload-content').style.opacity = '1';
                 });
                 resultValue.textContent = '-';
+            } else if (response.status === 413) {
+                showModal('Ошибка', 'Фото слишком большие. Попробуйте загрузить меньше снимков или сделайте новые фото.', true);
             } else {
                 showModal('Ошибка', 'Произошла ошибка при отправке. Попробуйте еще раз.', true);
             }

@@ -1,6 +1,7 @@
 import logging
 import os
 import json
+import uuid
 from typing import Optional, List
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Form, UploadFile, File, HTTPException, Response, Request
@@ -10,6 +11,7 @@ from fastapi.templating import Jinja2Templates
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
 from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.types import FSInputFile
 import asyncio
 
 # Configure logging
@@ -135,6 +137,33 @@ telegram_session = AiohttpSession(proxy=TELEGRAM_PROXY)
 bot = Bot(token=TELEGRAM_BOT_TOKEN, session=telegram_session)
 dp = Dispatcher()
 
+
+async def send_telegram_text(text: str) -> None:
+    for admin_id in TELEGRAM_ADMIN_CHAT_IDS:
+        try:
+            await bot.send_message(chat_id=admin_id, text=text, parse_mode=ParseMode.HTML)
+        except Exception as e:
+            logger.error("Failed to send message to admin %s: %s", admin_id, e)
+
+
+async def send_telegram_photos(photo_paths: List[str]) -> None:
+    if not photo_paths:
+        return
+    media_group = [types.InputMediaPhoto(media=FSInputFile(path_)) for path_ in photo_paths]
+    for admin_id in TELEGRAM_ADMIN_CHAT_IDS:
+        try:
+            await bot.send_media_group(chat_id=admin_id, media=media_group)
+        except Exception as e:
+            logger.error("Failed to send media group to admin %s: %s", admin_id, e)
+
+
+def schedule_telegram(coro) -> None:
+    task = asyncio.create_task(coro)
+    task.add_done_callback(
+        lambda t: logger.error("Telegram task failed: %s", t.exception()) if t.exception() else None
+    )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -234,7 +263,7 @@ async def handle_calculate(
     city: str = Form(...),
     email: Optional[str] = Form(None),
     message: Optional[str] = Form(None),
-    photos: List[UploadFile] = File(None)
+    photos: Optional[List[UploadFile]] = File(None),
 ):
     try:
         # 1. Logic (Normalization) - kept same
@@ -274,7 +303,9 @@ async def handle_calculate(
         if photos:
             for photo in photos:
                 if photo.filename:
-                    file_path = os.path.join(UPLOAD_DIR, photo.filename)
+                    ext = os.path.splitext(photo.filename)[1] or ".jpg"
+                    safe_name = f"{uuid.uuid4().hex}{ext}"
+                    file_path = os.path.join(UPLOAD_DIR, safe_name)
                     with open(file_path, "wb") as f:
                         f.write(await photo.read())
                     photo_paths.append(file_path)
@@ -298,31 +329,14 @@ async def handle_calculate(
             f"📸 Прикреплено фото: {photo_count} шт."
         )
         
-        # Send text
-        for admin_id in TELEGRAM_ADMIN_CHAT_IDS:
-            try:
-                await bot.send_message(chat_id=admin_id, text=msg_text, parse_mode=ParseMode.HTML)
-            except Exception as e:
-                logger.error(f"Failed to send message to admin {admin_id}: {e}")
-        
-        # Send photos
+        schedule_telegram(send_telegram_text(msg_text))
         if photo_paths:
-            media_group = []
-            for path_ in photo_paths:
-                from aiogram.types import FSInputFile
-                media_group.append(types.InputMediaPhoto(media=FSInputFile(path_)))
-            
-            if media_group:
-                for admin_id in TELEGRAM_ADMIN_CHAT_IDS:
-                    try:
-                        await bot.send_media_group(chat_id=admin_id, media=media_group)
-                    except Exception as e:
-                        logger.error(f"Failed to send media group to admin {admin_id}: {e}")
+            schedule_telegram(send_telegram_photos(photo_paths))
 
         return JSONResponse(content={"success": True, "price": price, "message": "Расчет отправлен"})
 
     except Exception as e:
-        logger.error(f"Error in calculate: {e}")
+        logger.exception("Error in calculate: %s", e)
         return JSONResponse(content={"success": False, "message": "Ошибка сервера"}, status_code=500)
 
 @app.post("/api/callback")
@@ -336,14 +350,10 @@ async def handle_callback(
             f"👤 Имя/ФИО: {fullname}\n"
             f"☎️ Телефон: {phone}"
         )
-        for admin_id in TELEGRAM_ADMIN_CHAT_IDS:
-            try:
-                await bot.send_message(chat_id=admin_id, text=msg, parse_mode=ParseMode.HTML)
-            except Exception as e:
-                logger.error(f"Failed to send callback to admin {admin_id}: {e}")
+        schedule_telegram(send_telegram_text(msg))
         return JSONResponse(content={"success": True, "message": "Заявка принята"})
     except Exception as e:
-        logger.error(f"Error in callback: {e}")
+        logger.exception("Error in callback: %s", e)
         return JSONResponse(content={"success": False, "message": "Ошибка сервера"}, status_code=500)
 
 # --- Bot Handlers (Simple User-Facing) ---

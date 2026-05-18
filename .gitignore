@@ -1,1 +1,10 @@
 ﻿__pycache__/
+*.py[cod]
+.env
+app.log
+uploads/*
+!uploads/.gitkeep
+node_modules/
+test-results/
+playwright-report/
+package-lock.json

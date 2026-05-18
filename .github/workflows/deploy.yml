@@ -53,6 +53,23 @@ jobs:
                 journalctl -u shinsetsu-hair --no-pager -n 20
                 exit 1
             fi
+
+            echo "→ Smoke test /api/calculate..."
+            sleep 2
+            RESPONSE=$(curl -sf -X POST http://127.0.0.1:8000/api/calculate \
+              -F "color=blonde" \
+              -F "length=50-60" \
+              -F "structure=straight" \
+              -F "condition=slavic" \
+              -F "name=DeployCheck" \
+              -F "phone=+70000000000" \
+              -F "city=Test")
+            echo "$RESPONSE" | grep -q '"success":true' || {
+              echo "✗ Smoke test failed: $RESPONSE"
+              journalctl -u shinsetsu-hair --no-pager -n 30
+              exit 1
+            }
+            echo "✓ Smoke test passed"
             
             echo "Deployment successful!"
 

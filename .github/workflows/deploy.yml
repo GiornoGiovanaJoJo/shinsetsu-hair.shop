@@ -35,10 +35,9 @@ jobs:
             cd /root/shinsetsu-hair
             mkdir -p uploads
 
-            # Останавливаем сервис и старые nohup-процессы, занимающие порт 8000
+            # Останавливаем сервис и процесс на порту 8000 (старый nohup)
             systemctl stop shinsetsu-hair 2>/dev/null || true
-            pkill -f "python3 main.py" 2>/dev/null || true
-            pkill -f "python3 -m uvicorn main:app" 2>/dev/null || true
+            sleep 1
             if command -v lsof >/dev/null 2>&1; then
               lsof -ti:8000 | xargs -r kill -9 2>/dev/null || true
             elif command -v fuser >/dev/null 2>&1; then

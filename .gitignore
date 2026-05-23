@@ -4,6 +4,7 @@
 app.log
 uploads/*
 !uploads/.gitkeep
+data/admin_finance.json
 node_modules/
 test-results/
 playwright-report/

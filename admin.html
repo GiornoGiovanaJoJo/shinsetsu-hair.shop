@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Админка — Shinsetsu Hair</title>
+    <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+    <div id="loginScreen" class="login-wrap">
+        <div class="login-card">
+            <h1>Shinsetsu Hair</h1>
+            <p>Финансы и заявки. Введите кодовую фразу для входа.</p>
+            <form id="loginForm">
+                <label for="phraseInput">Кодовая фраза</label>
+                <input type="password" id="phraseInput" name="phrase" autocomplete="current-password" required autofocus>
+                <p id="loginError" class="login-error"></p>
+                <button type="submit" class="btn btn-primary" style="width:100%">Войти</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="adminApp" class="admin-app admin-hidden">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">Shinsetsu · Админ</div>
+            <button type="button" class="admin-nav-btn active" data-tab="overview">Обзор</button>
+            <button type="button" class="admin-nav-btn" data-tab="leads">Заявки</button>
+            <button type="button" class="admin-nav-btn" data-tab="expenses">Расходы</button>
+            <div class="admin-sidebar-footer">
+                <a href="/" class="btn btn-ghost btn-sm" style="display:block;text-align:center;margin-bottom:0.5rem;text-decoration:none">На сайт</a>
+                <button type="button" id="logoutBtn" class="btn btn-ghost btn-sm" style="width:100%">Выйти</button>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h2 id="pageTitle">Обзор</h2>
+                <div class="month-picker">
+                    <label for="monthInput">Месяц:</label>
+                    <input type="month" id="monthInput">
+                </div>
+            </header>
+
+            <section class="tab-panel" data-tab="overview">
+                <div class="stats-grid">
+                    <div class="stat-card income">
+                        <div class="label">Доход (выкуплено)</div>
+                        <div class="value" id="statIncome">—</div>
+                    </div>
+                    <div class="stat-card pipeline">
+                        <div class="label">В работе (оценка)</div>
+                        <div class="value" id="statPipeline">—</div>
+                    </div>
+                    <div class="stat-card expense">
+                        <div class="label">Расходы за месяц</div>
+                        <div class="value" id="statExpense">—</div>
+                    </div>
+                    <div class="stat-card profit">
+                        <div class="label">Прибыль</div>
+                        <div class="value" id="statProfit">—</div>
+                    </div>
+                </div>
+                <div class="panel" style="padding:1rem">
+                    <h3 style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:0.5rem">Динамика за 6 месяцев</h3>
+                    <div id="chartBars" class="chart-bars"></div>
+                </div>
+            </section>
+
+            <section class="tab-panel admin-hidden" data-tab="leads">
+                <div class="panel">
+                    <div class="panel-toolbar">
+                        <label>Статус:</label>
+                        <select id="leadStatusFilter">
+                            <option value="all">Все</option>
+                            <option value="new">Новые</option>
+                            <option value="contacted">На связи</option>
+                            <option value="bought">Выкуплены</option>
+                            <option value="rejected">Отказы</option>
+                        </select>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Тип</th>
+                                <th>Клиент</th>
+                                <th>Город</th>
+                                <th>Оценка</th>
+                                <th>Факт</th>
+                                <th>Статус</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="tab-panel admin-hidden" data-tab="expenses">
+                <div class="panel" style="margin-bottom:1rem;padding:1rem">
+                    <h3 style="margin-bottom:1rem;font-size:1rem">Добавить расход</h3>
+                    <form id="expenseForm" class="form-row">
+                        <div class="form-group">
+                            <label>Название</label>
+                            <input type="text" id="expTitle" required placeholder="Яндекс.Директ">
+                        </div>
+                        <div class="form-group">
+                            <label>Сумма, ₽</label>
+                            <input type="number" id="expAmount" required min="0" step="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Категория</label>
+                            <select id="expCategory">
+                                <option value="marketing">Реклама</option>
+                                <option value="salary">Зарплата</option>
+                                <option value="rent">Аренда</option>
+                                <option value="logistics">Логистика</option>
+                                <option value="other">Прочее</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Дата</label>
+                            <input type="date" id="expDate">
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer">
+                                <input type="checkbox" id="expRecurring"> Ежемесячный
+                            </label>
+                        </div>
+                        <div class="form-group" style="flex:1;min-width:160px">
+                            <label>Заметка</label>
+                            <input type="text" id="expNotes" placeholder="Необязательно">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </form>
+                </div>
+                <div class="panel">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Категория</th>
+                                <th>Сумма</th>
+                                <th>Период</th>
+                                <th>Заметка</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="leadModal" class="modal-overlay admin-hidden">
+        <div class="modal">
+            <h3>Заявка</h3>
+            <p id="leadModalDetails" class="admin-hidden" style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:1rem"></p>
+            <input type="hidden" id="editLeadId">
+            <div class="form-row" style="flex-direction:column;align-items:stretch">
+                <div class="form-group">
+                    <label>Имя</label>
+                    <input type="text" id="editLeadName">
+                </div>
+                <div class="form-group">
+                    <label>Телефон</label>
+                    <input type="text" id="editLeadPhone">
+                </div>
+                <div class="form-group">
+                    <label>Город</label>
+                    <input type="text" id="editLeadCity">
+                </div>
+                <div class="form-group">
+                    <label>Статус</label>
+                    <select id="editLeadStatus">
+                        <option value="new">Новая</option>
+                        <option value="contacted">На связи</option>
+                        <option value="bought">Выкуплена</option>
+                        <option value="rejected">Отказ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Оценка с сайта, ₽</label>
+                    <input type="number" id="editLeadEstimated" min="0" step="500">
+                </div>
+                <div class="form-group">
+                    <label>Фактическая сумма выкупа, ₽</label>
+                    <input type="number" id="editLeadActual" min="0" step="500" placeholder="При статусе «Выкуплена»">
+                </div>
+                <div class="form-group">
+                    <label>Заметки</label>
+                    <textarea id="editLeadNotes"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="leadModalCancel" class="btn btn-ghost">Отмена</button>
+                <button type="button" id="leadModalSave" class="btn btn-primary">Сохранить</button>
+            </div>
+            <button type="button" id="leadModalClose" class="admin-hidden" aria-hidden="true"></button>
+        </div>
+    </div>
+
+    <script src="/admin.js"></script>
+</body>
+</html>

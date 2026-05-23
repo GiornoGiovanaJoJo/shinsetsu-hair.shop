@@ -1,0 +1,434 @@
+:root {
+    --color-bg: #160706;
+    --color-pink: #C7305C;
+    --color-pink-hover: #D54C73;
+    --color-text: #FFFFFF;
+    --color-text-muted: #AFAFAF;
+    --color-border: #443C42;
+    --color-input-bg: rgba(255, 255, 255, 0.05);
+    --color-success: #4caf7a;
+    --color-warning: #e6a23c;
+    --color-danger: #ff6b6b;
+    --sidebar-w: 240px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+}
+
+.admin-hidden {
+    display: none !important;
+}
+
+/* Login */
+.login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.login-card h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+    color: var(--color-pink);
+}
+
+.login-card p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.login-card label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 0.35rem;
+    color: var(--color-text-muted);
+}
+
+.login-card input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-input-bg);
+    color: var(--color-text);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.login-card input:focus {
+    outline: none;
+    border-color: var(--color-pink);
+}
+
+.login-error {
+    color: var(--color-danger);
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+    min-height: 1.2em;
+}
+
+/* Layout */
+.admin-app {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    border-right: 1px solid var(--color-border);
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.admin-logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-pink);
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+}
+
+.admin-nav-btn {
+    text-align: left;
+    padding: 0.65rem 0.75rem;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.admin-nav-btn:hover,
+.admin-nav-btn.active {
+    background: rgba(199, 48, 92, 0.15);
+    color: var(--color-text);
+}
+
+.admin-sidebar-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.admin-main {
+    flex: 1;
+    padding: 1.5rem 2rem;
+    overflow-x: auto;
+}
+
+.admin-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-header h2 {
+    font-size: 1.35rem;
+}
+
+.month-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.month-picker input,
+.month-picker select {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-input-bg);
+    color: var(--color-text);
+}
+
+/* Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+}
+
+.stat-card .label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.35rem;
+}
+
+.stat-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.stat-card.income .value { color: var(--color-success); }
+.stat-card.expense .value { color: var(--color-danger); }
+.stat-card.profit .value { color: var(--color-pink); }
+.stat-card.pipeline .value { color: var(--color-warning); }
+
+/* Table */
+.panel {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.panel-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    align-items: center;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.data-table th {
+    color: var(--color-text-muted);
+    font-weight: 500;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.data-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-new { background: rgba(230, 162, 60, 0.2); color: var(--color-warning); }
+.badge-contacted { background: rgba(100, 149, 237, 0.2); color: #8ab4f8; }
+.badge-bought { background: rgba(76, 175, 122, 0.2); color: var(--color-success); }
+.badge-rejected { background: rgba(255, 107, 107, 0.2); color: var(--color-danger); }
+.badge-callback { background: rgba(199, 48, 92, 0.2); color: var(--color-pink); }
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.15s;
+}
+
+.btn-primary {
+    background: var(--color-pink);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--color-pink-hover);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+}
+
+.btn-ghost:hover {
+    color: var(--color-text);
+    border-color: var(--color-pink);
+}
+
+.btn-sm {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8rem;
+}
+
+.btn-danger {
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+/* Forms */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-input-bg);
+    color: var(--color-text);
+    min-width: 120px;
+}
+
+.form-group textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 1rem;
+}
+
+.modal {
+    background: #1f1214;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal h3 {
+    margin-bottom: 1rem;
+    color: var(--color-pink);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    height: 120px;
+    padding: 1rem 0;
+}
+
+.chart-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.chart-bar {
+    width: 100%;
+    max-width: 48px;
+    background: var(--color-pink);
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: height 0.3s;
+}
+
+.chart-bar-wrap span {
+    font-size: 0.65rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .admin-app {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .admin-sidebar-footer {
+        margin-top: 0;
+        width: 100%;
+    }
+
+    .admin-main {
+        padding: 1rem;
+    }
+
+    .data-table {
+        font-size: 0.8rem;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem;
+    }
+}

@@ -2,12 +2,15 @@ import logging
 import os
 import json
 import uuid
+import secrets
 from typing import Optional, List, Union
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Form, UploadFile, File, HTTPException, Response, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from starlette.middleware.sessions import SessionMiddleware
+import admin_finance
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
 from aiogram.client.session.aiohttp import AiohttpSession
@@ -23,6 +26,11 @@ TELEGRAM_BOT_TOKEN = "8508276509:AAEJd40mw7ITW3dSOeGPCAj7e7janJINiRc"
 TELEGRAM_ADMIN_CHAT_IDS = ["8391275806", "1699147092", "482851314", "192647832", "7246811943"]
 # SOCKS5 proxy (Германия) — обход блокировки api.telegram.org на сервере
 TELEGRAM_PROXY = "socks5://qJ3u0v:cLcHk7@196.19.10.162:8000"
+
+# Админ-панель: кодовая фраза (можно переопределить через ADMIN_PASSPHRASE в .env)
+ADMIN_PASSPHRASE = os.getenv("ADMIN_PASSPHRASE", "Nikitoso02")
+ADMIN_SESSION_KEY = "admin_authenticated"
+ADMIN_SESSION_SECRET = os.getenv("ADMIN_SESSION_SECRET", "shinsetsu-admin-session-v1")
 
 # --- Calculator Logic (Ported) ---
 PRICE_TABLE = {
@@ -175,6 +183,17 @@ async def lifespan(app: FastAPI):
         pass
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(SessionMiddleware, secret_key=ADMIN_SESSION_SECRET, session_cookie="shinsetsu_admin")
+
+
+def _admin_ok(request: Request) -> bool:
+    return request.session.get(ADMIN_SESSION_KEY) is True
+
+
+def _require_admin(request: Request) -> None:
+    if not _admin_ok(request):
+        raise HTTPException(status_code=401, detail="Требуется вход в админку")
+
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="."), name="static")
@@ -209,12 +228,121 @@ async def read_styles():
 @app.get("/script.js")
 async def read_script():
     return FileResponse("script.js")
-    
+
+
+@app.get("/admin")
+async def admin_page():
+    return FileResponse("admin.html")
+
+
+@app.get("/admin.css")
+async def admin_styles():
+    return FileResponse("admin.css")
+
+
+@app.get("/admin.js")
+async def admin_script():
+    return FileResponse("admin.js")
+
+
+@app.post("/admin/login")
+async def admin_login(request: Request):
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    phrase = str(body.get("phrase", ""))
+    if not secrets.compare_digest(phrase, ADMIN_PASSPHRASE):
+        raise HTTPException(status_code=401, detail="Неверная кодовая фраза")
+    request.session[ADMIN_SESSION_KEY] = True
+    return {"ok": True}
+
+
+@app.post("/admin/logout")
+async def admin_logout(request: Request):
+    request.session.clear()
+    return {"ok": True}
+
+
+@app.get("/admin/api/me")
+async def admin_me(request: Request):
+    _require_admin(request)
+    return {"ok": True}
+
+
+@app.get("/admin/api/overview")
+async def admin_overview(request: Request, month: Optional[str] = None):
+    _require_admin(request)
+    if not month:
+        from datetime import datetime, timezone
+        month = datetime.now(timezone.utc).strftime("%Y-%m")
+    return {
+        "summary": admin_finance.month_summary(month),
+        "months": admin_finance.overview(6)["months"],
+    }
+
+
+@app.get("/admin/api/leads")
+async def admin_leads(request: Request, month: Optional[str] = None, status: str = "all"):
+    _require_admin(request)
+    return {"leads": admin_finance.list_leads(month=month, status=status)}
+
+
+@app.patch("/admin/api/leads/{lead_id}")
+async def admin_update_lead(request: Request, lead_id: str):
+    _require_admin(request)
+    patch = await request.json()
+    lead = admin_finance.update_lead(lead_id, patch)
+    if not lead:
+        raise HTTPException(status_code=404, detail="Заявка не найдена")
+    return {"lead": lead}
+
+
+@app.delete("/admin/api/leads/{lead_id}")
+async def admin_delete_lead(request: Request, lead_id: str):
+    _require_admin(request)
+    if not admin_finance.delete_lead(lead_id):
+        raise HTTPException(status_code=404, detail="Заявка не найдена")
+    return {"ok": True}
+
+
+@app.get("/admin/api/expenses")
+async def admin_expenses(request: Request, month: Optional[str] = None):
+    _require_admin(request)
+    return {"expenses": admin_finance.list_expenses(month=month)}
+
+
+@app.post("/admin/api/expenses")
+async def admin_add_expense(request: Request):
+    _require_admin(request)
+    payload = await request.json()
+    return {"expense": admin_finance.add_expense(payload)}
+
+
+@app.patch("/admin/api/expenses/{expense_id}")
+async def admin_patch_expense(request: Request, expense_id: str):
+    _require_admin(request)
+    patch = await request.json()
+    expense = admin_finance.update_expense(expense_id, patch)
+    if not expense:
+        raise HTTPException(status_code=404, detail="Расход не найден")
+    return {"expense": expense}
+
+
+@app.delete("/admin/api/expenses/{expense_id}")
+async def admin_delete_expense(request: Request, expense_id: str):
+    _require_admin(request)
+    if not admin_finance.delete_expense(expense_id):
+        raise HTTPException(status_code=404, detail="Расход не найден")
+    return {"ok": True}
+
+
 @app.get("/robots.txt", response_class=Response)
 async def read_robots():
     content = """User-agent: * 
 Allow: /
 Disallow: /cart/
+Disallow: /admin
 Sitemap: https://shinsetsu-hair.shop/sitemap.xml"""
     return Response(content=content, media_type="text/plain")
 
@@ -237,7 +365,8 @@ async def read_yandex_verification():
 # Block access to sensitive server-side files
 SENSITIVE_FILES = [
     "main.py", "deploy.sh", "content.json", "requirements.txt",
-    "app.log", ".env", "nginx.conf.template",
+    "app.log", ".env", "nginx.conf.template", "admin_finance.py",
+    "admin.html", "admin.css", "admin.js",
 ]
 
 @app.get("/{filename}")
@@ -330,6 +459,20 @@ async def handle_calculate(
         if photo_paths:
             schedule_telegram(send_telegram_photos(photo_paths))
 
+        admin_finance.add_calculate_lead(
+            name=name,
+            phone=phone,
+            city=city,
+            email=email,
+            message=message,
+            length=length,
+            color=color,
+            structure=structure,
+            condition=condition,
+            estimated_price=price,
+            photo_count=photo_count,
+        )
+
         return JSONResponse(content={"success": True, "price": price, "message": "Расчет отправлен"})
 
     except Exception as e:
@@ -348,6 +491,7 @@ async def handle_callback(
             f"☎️ Телефон: {phone}"
         )
         schedule_telegram(send_telegram_text(msg))
+        admin_finance.add_callback_lead(fullname=fullname, phone=phone)
         return JSONResponse(content={"success": True, "message": "Заявка принята"})
     except Exception as e:
         logger.exception("Error in callback: %s", e)

@@ -8,7 +8,8 @@ from datetime import datetime, timezone
 from threading import Lock
 from typing import Any, Dict, List, Optional
 
-DATA_DIR = "data"
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(_BASE_DIR, "data")
 DATA_FILE = os.path.join(DATA_DIR, "admin_finance.json")
 SEED_FILE = os.path.join(DATA_DIR, "leads_seed.json")
 
@@ -384,6 +385,11 @@ def list_expenses(month: Optional[str] = None) -> List[Dict[str, Any]]:
         elif _month_key(exp.get("date", "")) == month:
             result.append(exp)
     return result
+
+
+def count_expenses() -> int:
+    with _lock:
+        return len(_load()["expenses"])
 
 
 def add_expense(payload: Dict[str, Any]) -> Dict[str, Any]:

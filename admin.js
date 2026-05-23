@@ -63,10 +63,25 @@ function apiErrorMessage(err, data) {
     return err?.message || 'Ошибка сервера';
 }
 
-let currentMonth = new Date().toISOString().slice(0, 7);
+function currentLocalMonth() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+}
+
+function defaultExpenseDate() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const todayStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    if (todayStr.slice(0, 7) === currentMonth) return todayStr;
+    return `${currentMonth}-01`;
+}
+
+let currentMonth = currentLocalMonth();
 let currentTab = 'overview';
 let leadsCache = [];
 let expensesCache = [];
+let expenseFormBound = false;
 
 async function api(path, options = {}) {
     const res = await fetch(API + path, {
@@ -147,8 +162,12 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 function initApp() {
     const monthInput = document.getElementById('monthInput');
     monthInput.value = currentMonth;
+    const expDateEl = document.getElementById('expDate');
+    if (expDateEl) expDateEl.value = defaultExpenseDate();
+
     monthInput.addEventListener('change', () => {
         currentMonth = monthInput.value;
+        if (expDateEl) expDateEl.value = defaultExpenseDate();
         refreshCurrentTab();
     });
 
@@ -347,8 +366,9 @@ async function saveLeadModal() {
 }
 
 async function loadExpenses() {
-    const data = await api(`/expenses?month=${currentMonth}`);
+    const data = await api(`/expenses?month=${encodeURIComponent(currentMonth)}`);
     expensesCache = data.expenses || [];
+    const totalInStore = data.total_in_store ?? 0;
     const tbody = document.getElementById('expensesTableBody');
     tbody.innerHTML = expensesCache
         .map(
@@ -383,7 +403,11 @@ async function loadExpenses() {
     });
 
     if (!expensesCache.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Нет расходов за выбранный месяц. Проверьте месяц вверху справа.</td></tr>';
+        const hint =
+            totalInStore > 0
+                ? `За ${currentMonth} расходов нет, но в базе есть ${totalInStore} шт. — смените месяц справа вверху.`
+                : `Нет расходов за ${currentMonth}. Добавьте первый расход выше.`;
+        tbody.innerHTML = `<tr><td colspan="6" class="empty-row">${hint}</td></tr>`;
     }
 }
 
@@ -447,6 +471,9 @@ async function deleteExpenseModal() {
 }
 
 function bindExpenseForm() {
+    if (expenseFormBound) return;
+    expenseFormBound = true;
+
     const catSelect = document.getElementById('expCategory');
     const customWrap = document.getElementById('expCategoryCustomWrap');
     catSelect.addEventListener('change', () => {
@@ -471,19 +498,24 @@ function bindExpenseForm() {
         };
         try {
             const data = await api('/expenses', { method: 'POST', body: JSON.stringify(body) });
-            if (!body.is_recurring && data.expense?.date) {
-                syncMonthFromDate(data.expense.date);
+            const exp = data.expense;
+            if (exp?.date) {
+                syncMonthFromDate(exp.date);
             }
             e.target.reset();
             customWrap.classList.add('admin-hidden');
-            document.getElementById('expDate').value = currentMonth + '-01';
+            document.getElementById('expDate').value = defaultExpenseDate();
             await loadExpenses();
             if (currentTab === 'overview') await loadOverview();
+            if (exp) {
+                alert(
+                    `Расход добавлен:\n«${exp.title}» — ${fmtMoney(exp.amount)}\nДата: ${exp.date || '—'}`
+                );
+            }
         } catch (err) {
             showFormError(apiErrorMessage(err, err.data));
         }
     });
-    document.getElementById('expDate').value = currentMonth + '-01';
 }
 
 checkAuth();

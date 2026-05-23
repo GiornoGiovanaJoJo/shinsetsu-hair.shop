@@ -325,14 +325,26 @@ async def admin_delete_lead(request: Request, lead_id: str):
 @app.get("/admin/api/expenses")
 async def admin_expenses(request: Request, month: Optional[str] = None):
     _require_admin(request)
-    return {"expenses": admin_finance.list_expenses(month=month)}
+    return {
+        "expenses": admin_finance.list_expenses(month=month),
+        "total_in_store": admin_finance.count_expenses(),
+    }
 
 
 @app.post("/admin/api/expenses")
 async def admin_add_expense(request: Request):
     _require_admin(request)
-    payload = await request.json()
-    return {"expense": admin_finance.add_expense(payload)}
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Некорректные данные формы")
+    try:
+        expense = admin_finance.add_expense(payload)
+        logger.info("Expense added id=%s amount=%s date=%s", expense.get("id"), expense.get("amount"), expense.get("date"))
+        return {"expense": expense, "ok": True}
+    except Exception as e:
+        logger.exception("Failed to add expense: %s", e)
+        raise HTTPException(status_code=500, detail=f"Не удалось сохранить расход: {e}")
 
 
 @app.patch("/admin/api/expenses/{expense_id}")

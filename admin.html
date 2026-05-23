@@ -38,7 +38,7 @@
                 <h2 id="pageTitle">Обзор</h2>
                 <div class="month-picker">
                     <label for="monthInput">Месяц:</label>
-                    <input type="month" id="monthInput">
+                    <input type="month" id="monthInput" class="admin-select">
                 </div>
             </header>
 
@@ -68,10 +68,49 @@
             </section>
 
             <section class="tab-panel admin-hidden" data-tab="leads">
+                <div class="panel" style="margin-bottom:1rem;padding:1rem">
+                    <h3 class="panel-subtitle">Добавить заявку вручную</h3>
+                    <form id="addLeadForm" class="form-row">
+                        <div class="form-group">
+                            <label>Имя *</label>
+                            <input type="text" id="newLeadName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Телефон *</label>
+                            <input type="tel" id="newLeadPhone" required placeholder="+79...">
+                        </div>
+                        <div class="form-group">
+                            <label>Город</label>
+                            <input type="text" id="newLeadCity">
+                        </div>
+                        <div class="form-group">
+                            <label>Оценка, ₽</label>
+                            <input type="number" id="newLeadPrice" min="0" step="500">
+                        </div>
+                        <div class="form-group">
+                            <label>Статус</label>
+                            <select id="newLeadStatus">
+                                <option value="new">Новая</option>
+                                <option value="contacted" selected>На связи</option>
+                                <option value="bought">Выкуплена</option>
+                                <option value="rejected">Отказ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Дата заявки</label>
+                            <input type="datetime-local" id="newLeadDate">
+                        </div>
+                        <div class="form-group" style="flex:1;min-width:140px">
+                            <label>Заметка</label>
+                            <input type="text" id="newLeadNotes" placeholder="Необязательно">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </form>
+                </div>
                 <div class="panel">
                     <div class="panel-toolbar">
-                        <label>Статус:</label>
-                        <select id="leadStatusFilter">
+                        <label for="leadStatusFilter">Статус:</label>
+                        <select id="leadStatusFilter" class="admin-select">
                             <option value="all">Все</option>
                             <option value="new">Новые</option>
                             <option value="contacted">На связи</option>
@@ -111,13 +150,18 @@
                         </div>
                         <div class="form-group">
                             <label>Категория</label>
-                            <select id="expCategory">
+                            <select id="expCategory" class="admin-select">
                                 <option value="marketing">Реклама</option>
                                 <option value="salary">Зарплата</option>
                                 <option value="rent">Аренда</option>
                                 <option value="logistics">Логистика</option>
                                 <option value="other">Прочее</option>
+                                <option value="custom">Своя категория…</option>
                             </select>
+                        </div>
+                        <div class="form-group admin-hidden" id="expCategoryCustomWrap">
+                            <label>Своя категория</label>
+                            <input type="text" id="expCategoryCustom" placeholder="Например: Фотограф">
                         </div>
                         <div class="form-group">
                             <label>Дата</label>
@@ -175,7 +219,7 @@
                 </div>
                 <div class="form-group">
                     <label>Статус</label>
-                    <select id="editLeadStatus">
+                    <select id="editLeadStatus" class="admin-select">
                         <option value="new">Новая</option>
                         <option value="contacted">На связи</option>
                         <option value="bought">Выкуплена</option>
@@ -196,6 +240,8 @@
                 </div>
             </div>
             <div class="modal-actions">
+                <button type="button" id="leadModalDelete" class="btn btn-ghost btn-danger">Удалить</button>
+                <span style="flex:1"></span>
                 <button type="button" id="leadModalCancel" class="btn btn-ghost">Отмена</button>
                 <button type="button" id="leadModalSave" class="btn btn-primary">Сохранить</button>
             </div>

@@ -25,6 +25,7 @@ body {
     background: var(--color-bg);
     color: var(--color-text);
     min-height: 100vh;
+    color-scheme: dark;
 }
 
 .admin-hidden {
@@ -163,13 +164,49 @@ body {
     gap: 0.5rem;
 }
 
+.month-picker label {
+    color: var(--color-text);
+    font-size: 0.9rem;
+}
+
+.admin-select,
 .month-picker input,
-.month-picker select {
+.panel-toolbar select,
+.form-group select,
+.form-group input,
+.form-group textarea {
     padding: 0.5rem 0.75rem;
     border-radius: 8px;
     border: 1px solid var(--color-border);
-    background: var(--color-input-bg);
+    background: #2a1a1e;
     color: var(--color-text);
+    color-scheme: dark;
+}
+
+.admin-select option,
+.form-group select option,
+.panel-toolbar select option {
+    background: #2a1a1e;
+    color: var(--color-text);
+}
+
+.admin-select:focus,
+.form-group select:focus,
+.form-group input:focus {
+    outline: none;
+    border-color: var(--color-pink);
+    box-shadow: 0 0 0 2px rgba(199, 48, 92, 0.25);
+}
+
+.panel-subtitle {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+}
+
+.panel-toolbar label {
+    color: var(--color-text);
+    font-size: 0.9rem;
 }
 
 /* Cards */
@@ -233,16 +270,44 @@ body {
     border-bottom: 1px solid var(--color-border);
 }
 
+.data-table thead {
+    background: rgba(255, 255, 255, 0.06);
+}
+
 .data-table th {
-    color: var(--color-text-muted);
-    font-weight: 500;
-    font-size: 0.8rem;
+    color: #f0e8ea;
+    font-weight: 600;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.data-table td {
+    color: #ffffff;
+    vertical-align: middle;
+}
+
+.data-table td small {
+    color: #c4b8bc;
+    font-size: 0.8rem;
 }
 
 .data-table tr:hover td {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.empty-row {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: 2rem !important;
+}
+
+.actions-cell {
+    white-space: nowrap;
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
 }
 
 .badge {
@@ -321,11 +386,6 @@ body {
 .form-group input,
 .form-group select,
 .form-group textarea {
-    padding: 0.5rem 0.75rem;
-    border-radius: 8px;
-    border: 1px solid var(--color-border);
-    background: var(--color-input-bg);
-    color: var(--color-text);
     min-width: 120px;
 }
 

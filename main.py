@@ -176,6 +176,11 @@ def schedule_telegram(coro) -> None:
 async def lifespan(app: FastAPI):
     # Polling отключён: на сервере несколько воркеров вызывали TelegramConflictError.
     # Для заявок с сайта достаточно bot.send_message / send_media_group.
+    try:
+        admin_finance.init_finance_store()
+        logger.info("Finance store initialized (seeds applied, test leads purged)")
+    except Exception as e:
+        logger.error("Finance store init failed: %s", e)
     yield
     try:
         await bot.session.close()
@@ -286,6 +291,17 @@ async def admin_overview(request: Request, month: Optional[str] = None):
 async def admin_leads(request: Request, month: Optional[str] = None, status: str = "all"):
     _require_admin(request)
     return {"leads": admin_finance.list_leads(month=month, status=status)}
+
+
+@app.post("/admin/api/leads")
+async def admin_create_lead(request: Request):
+    _require_admin(request)
+    payload = await request.json()
+    try:
+        lead = admin_finance.add_manual_lead(payload)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"lead": lead}
 
 
 @app.patch("/admin/api/leads/{lead_id}")
@@ -459,19 +475,20 @@ async def handle_calculate(
         if photo_paths:
             schedule_telegram(send_telegram_photos(photo_paths))
 
-        admin_finance.add_calculate_lead(
-            name=name,
-            phone=phone,
-            city=city,
-            email=email,
-            message=message,
-            length=length,
-            color=color,
-            structure=structure,
-            condition=condition,
-            estimated_price=price,
-            photo_count=photo_count,
-        )
+        if not admin_finance.is_test_submission(name, phone, city):
+            admin_finance.add_calculate_lead(
+                name=name,
+                phone=phone,
+                city=city,
+                email=email,
+                message=message,
+                length=length,
+                color=color,
+                structure=structure,
+                condition=condition,
+                estimated_price=price,
+                photo_count=photo_count,
+            )
 
         return JSONResponse(content={"success": True, "price": price, "message": "Расчет отправлен"})
 
@@ -491,7 +508,8 @@ async def handle_callback(
             f"☎️ Телефон: {phone}"
         )
         schedule_telegram(send_telegram_text(msg))
-        admin_finance.add_callback_lead(fullname=fullname, phone=phone)
+        if not admin_finance.is_test_submission(fullname, phone, ""):
+            admin_finance.add_callback_lead(fullname=fullname, phone=phone)
         return JSONResponse(content={"success": True, "message": "Заявка принята"})
     except Exception as e:
         logger.exception("Error in callback: %s", e)

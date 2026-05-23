@@ -24,6 +24,10 @@ const CATEGORY_LABELS = {
     other: 'Прочее',
 };
 
+function categoryLabel(cat) {
+    return CATEGORY_LABELS[cat] || cat || '—';
+}
+
 let currentMonth = new Date().toISOString().slice(0, 7);
 let currentTab = 'overview';
 let leadsCache = [];
@@ -115,6 +119,7 @@ function initApp() {
     refreshCurrentTab();
     bindLeadModal();
     bindExpenseForm();
+    bindAddLeadForm();
 }
 
 function refreshCurrentTab() {
@@ -168,7 +173,10 @@ async function loadLeads() {
                 <td>${est}</td>
                 <td>${actual}</td>
                 <td><span class="badge ${statusClass}">${STATUS_LABELS[lead.status] || lead.status}</span></td>
-                <td><button class="btn btn-ghost btn-sm edit-lead">Изменить</button></td>
+                <td class="actions-cell">
+                    <button type="button" class="btn btn-ghost btn-sm edit-lead">Изменить</button>
+                    <button type="button" class="btn btn-ghost btn-sm btn-danger delete-lead">Удалить</button>
+                </td>
             </tr>`;
         })
         .join('');
@@ -179,6 +187,20 @@ async function loadLeads() {
             openLeadModal(leadsCache.find((l) => l.id === id));
         });
     });
+    tbody.querySelectorAll('.delete-lead').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            const id = btn.closest('tr').dataset.id;
+            const lead = leadsCache.find((l) => l.id === id);
+            if (!confirm(`Удалить заявку «${lead?.name || ''}»?`)) return;
+            await api(`/leads/${id}`, { method: 'DELETE' });
+            loadLeads();
+            if (currentTab === 'overview') loadOverview();
+        });
+    });
+
+    if (!leadsCache.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-row">Нет заявок за выбранный месяц</td></tr>';
+    }
 }
 
 function escapeHtml(s) {
@@ -191,7 +213,46 @@ function bindLeadModal() {
     document.getElementById('leadModalClose').addEventListener('click', closeLeadModal);
     document.getElementById('leadModalCancel').addEventListener('click', closeLeadModal);
     document.getElementById('leadModalSave').addEventListener('click', saveLeadModal);
+    document.getElementById('leadModalDelete').addEventListener('click', deleteLeadModal);
     document.getElementById('leadStatusFilter').addEventListener('change', loadLeads);
+}
+
+function bindAddLeadForm() {
+    document.getElementById('addLeadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dateVal = document.getElementById('newLeadDate').value;
+        let created_at;
+        if (dateVal) {
+            created_at = new Date(dateVal).toISOString();
+        }
+        const price = document.getElementById('newLeadPrice').value;
+        const body = {
+            type: 'calculate',
+            name: document.getElementById('newLeadName').value,
+            phone: document.getElementById('newLeadPhone').value,
+            city: document.getElementById('newLeadCity').value,
+            status: document.getElementById('newLeadStatus').value,
+            estimated_price: price || null,
+            actual_amount: price || null,
+            notes: document.getElementById('newLeadNotes').value || 'Добавлено вручную',
+            created_at,
+        };
+        await api('/leads', { method: 'POST', body: JSON.stringify(body) });
+        e.target.reset();
+        document.getElementById('newLeadStatus').value = 'contacted';
+        loadLeads();
+        if (currentTab === 'overview') loadOverview();
+    });
+}
+
+async function deleteLeadModal() {
+    const id = document.getElementById('editLeadId').value;
+    const name = document.getElementById('editLeadName').value;
+    if (!confirm(`Удалить заявку «${name}»?`)) return;
+    await api(`/leads/${id}`, { method: 'DELETE' });
+    closeLeadModal();
+    loadLeads();
+    if (currentTab === 'overview') loadOverview();
 }
 
 function openLeadModal(lead) {
@@ -243,7 +304,7 @@ async function loadExpenses() {
         .map(
             (exp) => `<tr data-id="${exp.id}">
             <td>${escapeHtml(exp.title)}</td>
-            <td>${CATEGORY_LABELS[exp.category] || exp.category}</td>
+            <td>${escapeHtml(categoryLabel(exp.category))}</td>
             <td>${fmtMoney(exp.amount)}</td>
             <td>${exp.is_recurring ? '<span class="badge badge-contacted">Ежемесячно</span>' : escapeHtml(exp.date || '—')}</td>
             <td>${escapeHtml(exp.notes || '')}</td>
@@ -264,18 +325,26 @@ async function loadExpenses() {
 }
 
 function bindExpenseForm() {
+    const catSelect = document.getElementById('expCategory');
+    const customWrap = document.getElementById('expCategoryCustomWrap');
+    catSelect.addEventListener('change', () => {
+        customWrap.classList.toggle('admin-hidden', catSelect.value !== 'custom');
+    });
+
     document.getElementById('expenseForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const body = {
             title: document.getElementById('expTitle').value,
             amount: document.getElementById('expAmount').value,
-            category: document.getElementById('expCategory').value,
+            category: catSelect.value,
+            category_custom: document.getElementById('expCategoryCustom').value,
             is_recurring: document.getElementById('expRecurring').checked,
             date: document.getElementById('expDate').value || currentMonth + '-01',
             notes: document.getElementById('expNotes').value,
         };
         await api('/expenses', { method: 'POST', body: JSON.stringify(body) });
         e.target.reset();
+        customWrap.classList.add('admin-hidden');
         document.getElementById('expDate').value = currentMonth + '-01';
         loadExpenses();
         if (currentTab === 'overview') loadOverview();

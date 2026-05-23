@@ -98,7 +98,11 @@
                         </div>
                         <div class="form-group">
                             <label>Дата заявки</label>
-                            <input type="datetime-local" id="newLeadDate">
+                            <input type="datetime-local" id="newLeadDate" class="admin-select">
+                        </div>
+                        <div class="form-group">
+                            <label>Дата выкупа / дохода</label>
+                            <input type="datetime-local" id="newLeadClosedDate" class="admin-select" title="Для статуса «Выкуплена»">
                         </div>
                         <div class="form-group" style="flex:1;min-width:140px">
                             <label>Заметка</label>
@@ -164,8 +168,8 @@
                             <input type="text" id="expCategoryCustom" placeholder="Например: Фотограф">
                         </div>
                         <div class="form-group">
-                            <label>Дата</label>
-                            <input type="date" id="expDate">
+                            <label>Дата расхода</label>
+                            <input type="date" id="expDate" class="admin-select">
                         </div>
                         <div class="form-group">
                             <label>&nbsp;</label>
@@ -235,6 +239,14 @@
                     <input type="number" id="editLeadActual" min="0" step="500" placeholder="При статусе «Выкуплена»">
                 </div>
                 <div class="form-group">
+                    <label>Дата заявки</label>
+                    <input type="datetime-local" id="editLeadCreatedAt" class="admin-select">
+                </div>
+                <div class="form-group">
+                    <label>Дата выкупа / дохода</label>
+                    <input type="datetime-local" id="editLeadClosedAt" class="admin-select" title="В каком месяце учитывать доход">
+                </div>
+                <div class="form-group">
                     <label>Заметки</label>
                     <textarea id="editLeadNotes"></textarea>
                 </div>
@@ -246,6 +258,46 @@
                 <button type="button" id="leadModalSave" class="btn btn-primary">Сохранить</button>
             </div>
             <button type="button" id="leadModalClose" class="admin-hidden" aria-hidden="true"></button>
+        </div>
+    </div>
+
+    <div id="expenseModal" class="modal-overlay admin-hidden">
+        <div class="modal">
+            <h3>Расход</h3>
+            <input type="hidden" id="editExpenseId">
+            <div class="form-row" style="flex-direction:column;align-items:stretch">
+                <div class="form-group">
+                    <label>Название</label>
+                    <input type="text" id="editExpTitle">
+                </div>
+                <div class="form-group">
+                    <label>Сумма, ₽</label>
+                    <input type="number" id="editExpAmount" min="0" step="100">
+                </div>
+                <div class="form-group">
+                    <label>Категория</label>
+                    <input type="text" id="editExpCategory" placeholder="Реклама, аренда или своя">
+                </div>
+                <div class="form-group">
+                    <label>Дата расхода</label>
+                    <input type="date" id="editExpDate" class="admin-select">
+                </div>
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer">
+                        <input type="checkbox" id="editExpRecurring"> Ежемесячный
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>Заметка</label>
+                    <input type="text" id="editExpNotes">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="expenseModalDelete" class="btn btn-ghost btn-danger">Удалить</button>
+                <span style="flex:1"></span>
+                <button type="button" id="expenseModalCancel" class="btn btn-ghost">Отмена</button>
+                <button type="button" id="expenseModalSave" class="btn btn-primary">Сохранить</button>
+            </div>
         </div>
     </div>
 

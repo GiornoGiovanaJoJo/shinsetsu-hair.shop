@@ -26,6 +26,23 @@ def _month_key(iso_dt: str) -> str:
     return iso_dt[:7]
 
 
+def _parse_datetime(value: Any) -> Optional[str]:
+    if value in (None, "", "null"):
+        return None
+    raw = str(value).strip()
+    if not raw:
+        return None
+    if len(raw) == 10:
+        raw = raw + "T12:00:00"
+    try:
+        dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc).replace(microsecond=0).isoformat()
+    except ValueError:
+        return None
+
+
 def _normalize_phone(phone: str) -> str:
     digits = re.sub(r"\D", "", phone or "")
     if len(digits) == 11 and digits.startswith("8"):
@@ -228,7 +245,10 @@ def add_manual_lead(payload: Dict[str, Any]) -> Dict[str, Any]:
     actual = payload.get("actual_amount")
     actual_amount = int(actual) if actual not in (None, "", "null") else None
     status = payload.get("status") if payload.get("status") in LEAD_STATUSES else "new"
-    created_at = str(payload.get("created_at") or _utc_now())
+    created_at = _parse_datetime(payload.get("created_at")) or _utc_now()
+    closed_at = _parse_datetime(payload.get("closed_at"))
+    if status == "bought" and not closed_at:
+        closed_at = _utc_now()
 
     lead = {
         "id": uuid.uuid4().hex[:12],
@@ -237,7 +257,7 @@ def add_manual_lead(payload: Dict[str, Any]) -> Dict[str, Any]:
         "status": status,
         "estimated_price": estimated_price,
         "actual_amount": actual_amount,
-        "closed_at": _utc_now() if status == "bought" else None,
+        "closed_at": closed_at,
         "name": name,
         "phone": phone,
         "city": city,
@@ -263,7 +283,15 @@ def list_leads(month: Optional[str] = None, status: Optional[str] = None) -> Lis
     if status and status != "all":
         leads = [l for l in leads if l.get("status") == status]
     if month:
-        leads = [l for l in leads if _month_key(l.get("created_at", "")) == month]
+
+        def _lead_in_month(lead: Dict[str, Any]) -> bool:
+            if _month_key(lead.get("created_at", "")) == month:
+                return True
+            if lead.get("status") == "bought" and lead.get("closed_at"):
+                return _month_key(str(lead.get("closed_at", ""))) == month
+            return False
+
+        leads = [l for l in leads if _lead_in_month(l)]
     leads.sort(key=lambda l: l.get("created_at", ""), reverse=True)
     return leads
 
@@ -274,12 +302,18 @@ def update_lead(lead_id: str, patch: Dict[str, Any]) -> Optional[Dict[str, Any]]
         for lead in data["leads"]:
             if lead.get("id") != lead_id:
                 continue
+            if "created_at" in patch:
+                parsed = _parse_datetime(patch.get("created_at"))
+                if parsed:
+                    lead["created_at"] = parsed
+            if "closed_at" in patch:
+                lead["closed_at"] = _parse_datetime(patch.get("closed_at"))
             if "status" in patch and patch["status"] in LEAD_STATUSES:
                 old_status = lead.get("status")
                 lead["status"] = patch["status"]
-                if patch["status"] == "bought" and old_status != "bought":
+                if patch["status"] == "bought" and old_status != "bought" and not lead.get("closed_at"):
                     lead["closed_at"] = _utc_now()
-                if patch["status"] != "bought":
+                if patch["status"] != "bought" and "closed_at" not in patch:
                     lead["closed_at"] = None
             if "actual_amount" in patch:
                 val = patch["actual_amount"]
@@ -353,7 +387,7 @@ def add_expense(payload: Dict[str, Any]) -> Dict[str, Any]:
         "amount": max(0, int(payload.get("amount", 0) or 0)),
         "category": category,
         "is_recurring": bool(payload.get("is_recurring")),
-        "date": str(payload.get("date") or _utc_now()[:10]),
+        "date": (_parse_datetime(payload.get("date")) or _utc_now())[:10],
         "notes": str(payload.get("notes") or ""),
     }
     with _lock:
@@ -378,7 +412,11 @@ def update_expense(expense_id: str, patch: Dict[str, Any]) -> Optional[Dict[str,
             if "is_recurring" in patch:
                 exp["is_recurring"] = bool(patch["is_recurring"])
             if "date" in patch:
-                exp["date"] = str(patch["date"] or exp.get("date", ""))
+                parsed = _parse_datetime(patch.get("date"))
+                if parsed:
+                    exp["date"] = parsed[:10]
+                elif patch.get("date"):
+                    exp["date"] = str(patch["date"])[:10]
             if "notes" in patch:
                 exp["notes"] = str(patch["notes"] or "")
             _save(data)

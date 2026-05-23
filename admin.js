@@ -28,6 +28,24 @@ function categoryLabel(cat) {
     return CATEGORY_LABELS[cat] || cat || '—';
 }
 
+function isoToDatetimeLocal(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function datetimeLocalToIso(value) {
+    if (!value) return null;
+    return new Date(value).toISOString();
+}
+
+function dateInputToIso(value) {
+    if (!value) return null;
+    return new Date(value + 'T12:00:00').toISOString();
+}
+
 let currentMonth = new Date().toISOString().slice(0, 7);
 let currentTab = 'overview';
 let leadsCache = [];
@@ -120,6 +138,7 @@ function initApp() {
     bindLeadModal();
     bindExpenseForm();
     bindAddLeadForm();
+    bindExpenseModal();
 }
 
 function refreshCurrentTab() {
@@ -220,22 +239,21 @@ function bindLeadModal() {
 function bindAddLeadForm() {
     document.getElementById('addLeadForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const dateVal = document.getElementById('newLeadDate').value;
-        let created_at;
-        if (dateVal) {
-            created_at = new Date(dateVal).toISOString();
-        }
+        const created_at = datetimeLocalToIso(document.getElementById('newLeadDate').value);
+        const closed_at = datetimeLocalToIso(document.getElementById('newLeadClosedDate').value);
         const price = document.getElementById('newLeadPrice').value;
+        const status = document.getElementById('newLeadStatus').value;
         const body = {
             type: 'calculate',
             name: document.getElementById('newLeadName').value,
             phone: document.getElementById('newLeadPhone').value,
             city: document.getElementById('newLeadCity').value,
-            status: document.getElementById('newLeadStatus').value,
+            status,
             estimated_price: price || null,
             actual_amount: price || null,
             notes: document.getElementById('newLeadNotes').value || 'Добавлено вручную',
             created_at,
+            closed_at: status === 'bought' ? closed_at : closed_at || null,
         };
         await api('/leads', { method: 'POST', body: JSON.stringify(body) });
         e.target.reset();
@@ -265,6 +283,8 @@ function openLeadModal(lead) {
     document.getElementById('editLeadStatus').value = lead.status || 'new';
     document.getElementById('editLeadEstimated').value = lead.estimated_price ?? '';
     document.getElementById('editLeadActual').value = lead.actual_amount ?? '';
+    document.getElementById('editLeadCreatedAt').value = isoToDatetimeLocal(lead.created_at);
+    document.getElementById('editLeadClosedAt').value = isoToDatetimeLocal(lead.closed_at);
     document.getElementById('editLeadNotes').value = lead.notes || '';
     const details = document.getElementById('leadModalDetails');
     if (lead.type === 'calculate') {
@@ -288,6 +308,8 @@ async function saveLeadModal() {
         city: document.getElementById('editLeadCity').value,
         estimated_price: document.getElementById('editLeadEstimated').value || null,
         actual_amount: document.getElementById('editLeadActual').value || null,
+        created_at: datetimeLocalToIso(document.getElementById('editLeadCreatedAt').value),
+        closed_at: datetimeLocalToIso(document.getElementById('editLeadClosedAt').value),
         notes: document.getElementById('editLeadNotes').value,
     };
     await api(`/leads/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
@@ -308,11 +330,20 @@ async function loadExpenses() {
             <td>${fmtMoney(exp.amount)}</td>
             <td>${exp.is_recurring ? '<span class="badge badge-contacted">Ежемесячно</span>' : escapeHtml(exp.date || '—')}</td>
             <td>${escapeHtml(exp.notes || '')}</td>
-            <td><button class="btn btn-ghost btn-sm btn-danger delete-expense">Удалить</button></td>
+            <td class="actions-cell">
+                <button type="button" class="btn btn-ghost btn-sm edit-expense">Изменить</button>
+                <button type="button" class="btn btn-ghost btn-sm btn-danger delete-expense">Удалить</button>
+            </td>
         </tr>`
         )
         .join('');
 
+    tbody.querySelectorAll('.edit-expense').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const id = btn.closest('tr').dataset.id;
+            openExpenseModal(expensesCache.find((e) => e.id === id));
+        });
+    });
     tbody.querySelectorAll('.delete-expense').forEach((btn) => {
         btn.addEventListener('click', async () => {
             if (!confirm('Удалить расход?')) return;
@@ -322,6 +353,65 @@ async function loadExpenses() {
             if (currentTab === 'overview') loadOverview();
         });
     });
+}
+
+function bindExpenseModal() {
+    document.getElementById('expenseModalCancel').addEventListener('click', closeExpenseModal);
+    document.getElementById('expenseModalSave').addEventListener('click', saveExpenseModal);
+    document.getElementById('expenseModalDelete').addEventListener('click', deleteExpenseModal);
+}
+
+function openExpenseModal(exp) {
+    if (!exp) return;
+    document.getElementById('expenseModal').classList.remove('admin-hidden');
+    document.getElementById('editExpenseId').value = exp.id;
+    document.getElementById('editExpTitle').value = exp.title || '';
+    document.getElementById('editExpAmount').value = exp.amount ?? '';
+    document.getElementById('editExpCategory').value = categoryLabel(exp.category);
+    document.getElementById('editExpDate').value = (exp.date || '').slice(0, 10);
+    document.getElementById('editExpRecurring').checked = !!exp.is_recurring;
+    document.getElementById('editExpNotes').value = exp.notes || '';
+}
+
+function closeExpenseModal() {
+    document.getElementById('expenseModal').classList.add('admin-hidden');
+}
+
+async function saveExpenseModal() {
+    const id = document.getElementById('editExpenseId').value;
+    const catRaw = document.getElementById('editExpCategory').value.trim();
+    const presetKeys = Object.keys(CATEGORY_LABELS);
+    let category = 'other';
+    let category_custom = '';
+    const found = presetKeys.find((k) => CATEGORY_LABELS[k].toLowerCase() === catRaw.toLowerCase());
+    if (found) {
+        category = found;
+    } else if (catRaw) {
+        category = 'custom';
+        category_custom = catRaw;
+    }
+    const body = {
+        title: document.getElementById('editExpTitle').value,
+        amount: document.getElementById('editExpAmount').value,
+        category,
+        category_custom,
+        date: dateInputToIso(document.getElementById('editExpDate').value),
+        is_recurring: document.getElementById('editExpRecurring').checked,
+        notes: document.getElementById('editExpNotes').value,
+    };
+    await api(`/expenses/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+    closeExpenseModal();
+    loadExpenses();
+    if (currentTab === 'overview') loadOverview();
+}
+
+async function deleteExpenseModal() {
+    const id = document.getElementById('editExpenseId').value;
+    if (!confirm('Удалить расход?')) return;
+    await api(`/expenses/${id}`, { method: 'DELETE' });
+    closeExpenseModal();
+    loadExpenses();
+    if (currentTab === 'overview') loadOverview();
 }
 
 function bindExpenseForm() {
@@ -339,7 +429,7 @@ function bindExpenseForm() {
             category: catSelect.value,
             category_custom: document.getElementById('expCategoryCustom').value,
             is_recurring: document.getElementById('expRecurring').checked,
-            date: document.getElementById('expDate').value || currentMonth + '-01',
+            date: dateInputToIso(document.getElementById('expDate').value) || dateInputToIso(currentMonth + '-01'),
             notes: document.getElementById('expNotes').value,
         };
         await api('/expenses', { method: 'POST', body: JSON.stringify(body) });

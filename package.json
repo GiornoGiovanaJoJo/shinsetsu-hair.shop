@@ -1,0 +1,26 @@
+{
+  "name": "shinsetsu-hair.shop",
+  "version": "1.0.0",
+  "main": "script.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GiornoGiovanaJoJo/shinsetsu-hair.shop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GiornoGiovanaJoJo/shinsetsu-hair.shop/issues"
+  },
+  "homepage": "https://github.com/GiornoGiovanaJoJo/shinsetsu-hair.shop#readme",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
+  }
+}

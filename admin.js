@@ -167,7 +167,6 @@ function initApp() {
 
     monthInput.addEventListener('change', () => {
         currentMonth = monthInput.value;
-        if (expDateEl) expDateEl.value = defaultExpenseDate();
         refreshCurrentTab();
     });
 
@@ -365,25 +364,48 @@ async function saveLeadModal() {
     if (currentTab === 'overview') loadOverview();
 }
 
+function fmtExpenseDate(exp) {
+    if (exp.is_recurring) return '—';
+    if (!exp.date) return '—';
+    const [y, m, d] = exp.date.split('-');
+    return `${d}.${m}.${y}`;
+}
+
+function expenseMonthKey(exp) {
+    if (exp.is_recurring) return null;
+    return (exp.date || '').slice(0, 7);
+}
+
 async function loadExpenses() {
-    const data = await api(`/expenses?month=${encodeURIComponent(currentMonth)}`);
-    expensesCache = data.expenses || [];
-    const totalInStore = data.total_in_store ?? 0;
+    const data = await api('/expenses');
+    expensesCache = (data.expenses || []).slice().sort((a, b) => {
+        if (a.is_recurring && !b.is_recurring) return -1;
+        if (!a.is_recurring && b.is_recurring) return 1;
+        return (b.date || '').localeCompare(a.date || '');
+    });
+    const totalInStore = data.total_in_store ?? expensesCache.length;
     const tbody = document.getElementById('expensesTableBody');
     tbody.innerHTML = expensesCache
-        .map(
-            (exp) => `<tr data-id="${exp.id}">
+        .map((exp) => {
+            const mKey = expenseMonthKey(exp);
+            const rowClass =
+                exp.is_recurring || mKey === currentMonth ? 'row-current-month' : 'row-other-month';
+            const typeCell = exp.is_recurring
+                ? '<span class="badge badge-contacted">Ежемесячный</span>'
+                : '<span class="badge badge-new">Разовый</span>';
+            return `<tr data-id="${exp.id}" class="${rowClass}">
+            <td>${exp.is_recurring ? '—' : escapeHtml(fmtExpenseDate(exp))}</td>
             <td>${escapeHtml(exp.title)}</td>
             <td>${escapeHtml(categoryLabel(exp.category))}</td>
             <td>${fmtMoney(exp.amount)}</td>
-            <td>${exp.is_recurring ? '<span class="badge badge-contacted">Ежемесячно</span>' : escapeHtml(exp.date || '—')}</td>
+            <td>${typeCell}</td>
             <td>${escapeHtml(exp.notes || '')}</td>
             <td class="actions-cell">
                 <button type="button" class="btn btn-ghost btn-sm edit-expense">Изменить</button>
                 <button type="button" class="btn btn-ghost btn-sm btn-danger delete-expense">Удалить</button>
             </td>
-        </tr>`
-        )
+        </tr>`;
+        })
         .join('');
 
     tbody.querySelectorAll('.edit-expense').forEach((btn) => {
@@ -403,11 +425,8 @@ async function loadExpenses() {
     });
 
     if (!expensesCache.length) {
-        const hint =
-            totalInStore > 0
-                ? `За ${currentMonth} расходов нет, но в базе есть ${totalInStore} шт. — смените месяц справа вверху.`
-                : `Нет расходов за ${currentMonth}. Добавьте первый расход выше.`;
-        tbody.innerHTML = `<tr><td colspan="6" class="empty-row">${hint}</td></tr>`;
+        tbody.innerHTML =
+            '<tr><td colspan="7" class="empty-row">Расходов пока нет. Добавьте первый расход в форме выше.</td></tr>';
     }
 }
 
@@ -499,17 +518,19 @@ function bindExpenseForm() {
         try {
             const data = await api('/expenses', { method: 'POST', body: JSON.stringify(body) });
             const exp = data.expense;
-            if (exp?.date) {
-                syncMonthFromDate(exp.date);
-            }
             e.target.reset();
             customWrap.classList.add('admin-hidden');
             document.getElementById('expDate').value = defaultExpenseDate();
             await loadExpenses();
             if (currentTab === 'overview') await loadOverview();
             if (exp) {
+                const bookMonth = exp.is_recurring
+                    ? 'каждый месяц (в обзоре)'
+                    : (exp.date || '').slice(0, 7) || '—';
                 alert(
-                    `Расход добавлен:\n«${exp.title}» — ${fmtMoney(exp.amount)}\nДата: ${exp.date || '—'}`
+                    `Расход добавлен:\n«${exp.title}» — ${fmtMoney(exp.amount)}\n` +
+                        `Дата: ${exp.is_recurring ? 'ежемесячно' : fmtExpenseDate(exp)}\n` +
+                        `В «Обзоре» учитывается за: ${bookMonth}`
                 );
             }
         } catch (err) {

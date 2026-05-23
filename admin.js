@@ -46,6 +46,23 @@ function dateInputToIso(value) {
     return new Date(value + 'T12:00:00').toISOString();
 }
 
+/** Дата для API без сдвига часового пояса (YYYY-MM-DD) */
+function dateForApi(value) {
+    if (!value) return null;
+    return String(value).trim().slice(0, 10);
+}
+
+function showFormError(message) {
+    alert(message || 'Не удалось сохранить. Проверьте поля и попробуйте снова.');
+}
+
+function apiErrorMessage(err, data) {
+    if (data?.detail) {
+        return typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+    }
+    return err?.message || 'Ошибка сервера';
+}
+
 let currentMonth = new Date().toISOString().slice(0, 7);
 let currentTab = 'overview';
 let leadsCache = [];
@@ -62,8 +79,19 @@ async function api(path, options = {}) {
         throw new Error('unauthorized');
     }
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.detail || data.message || 'Ошибка');
+    if (!res.ok) {
+        const err = new Error(apiErrorMessage(null, data));
+        err.data = data;
+        throw err;
+    }
     return data;
+}
+
+function syncMonthFromDate(dateStr) {
+    const month = (dateStr || '').slice(0, 7);
+    if (!month || month.length < 7) return;
+    currentMonth = month;
+    document.getElementById('monthInput').value = month;
 }
 
 function showLogin() {
@@ -353,6 +381,10 @@ async function loadExpenses() {
             if (currentTab === 'overview') loadOverview();
         });
     });
+
+    if (!expensesCache.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Нет расходов за выбранный месяц. Проверьте месяц вверху справа.</td></tr>';
+    }
 }
 
 function bindExpenseModal() {
@@ -395,7 +427,7 @@ async function saveExpenseModal() {
         amount: document.getElementById('editExpAmount').value,
         category,
         category_custom,
-        date: dateInputToIso(document.getElementById('editExpDate').value),
+        date: dateForApi(document.getElementById('editExpDate').value),
         is_recurring: document.getElementById('editExpRecurring').checked,
         notes: document.getElementById('editExpNotes').value,
     };
@@ -423,21 +455,33 @@ function bindExpenseForm() {
 
     document.getElementById('expenseForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const expDateVal = document.getElementById('expDate').value || currentMonth + '-01';
+        if (catSelect.value === 'custom' && !document.getElementById('expCategoryCustom').value.trim()) {
+            showFormError('Укажите название своей категории или выберите другую.');
+            return;
+        }
         const body = {
             title: document.getElementById('expTitle').value,
             amount: document.getElementById('expAmount').value,
             category: catSelect.value,
             category_custom: document.getElementById('expCategoryCustom').value,
             is_recurring: document.getElementById('expRecurring').checked,
-            date: dateInputToIso(document.getElementById('expDate').value) || dateInputToIso(currentMonth + '-01'),
+            date: dateForApi(expDateVal),
             notes: document.getElementById('expNotes').value,
         };
-        await api('/expenses', { method: 'POST', body: JSON.stringify(body) });
-        e.target.reset();
-        customWrap.classList.add('admin-hidden');
-        document.getElementById('expDate').value = currentMonth + '-01';
-        loadExpenses();
-        if (currentTab === 'overview') loadOverview();
+        try {
+            const data = await api('/expenses', { method: 'POST', body: JSON.stringify(body) });
+            if (!body.is_recurring && data.expense?.date) {
+                syncMonthFromDate(data.expense.date);
+            }
+            e.target.reset();
+            customWrap.classList.add('admin-hidden');
+            document.getElementById('expDate').value = currentMonth + '-01';
+            await loadExpenses();
+            if (currentTab === 'overview') await loadOverview();
+        } catch (err) {
+            showFormError(apiErrorMessage(err, err.data));
+        }
     });
     document.getElementById('expDate').value = currentMonth + '-01';
 }

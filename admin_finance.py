@@ -26,6 +26,13 @@ def _month_key(iso_dt: str) -> str:
     return iso_dt[:7]
 
 
+def _safe_amount(value: Any) -> int:
+    try:
+        return max(0, int(float(value)))
+    except (TypeError, ValueError):
+        return 0
+
+
 def _parse_datetime(value: Any) -> Optional[str]:
     if value in (None, "", "null"):
         return None
@@ -343,8 +350,8 @@ def delete_lead(lead_id: str) -> bool:
 def _normalize_expense_category(payload: Dict[str, Any]) -> str:
     preset = str(payload.get("category") or "").strip()
     custom = str(payload.get("category_custom") or "").strip()
-    if preset == "custom" and custom:
-        return custom[:80]
+    if preset == "custom":
+        return custom[:80] if custom else "other"
     if preset in EXPENSE_CATEGORY_PRESETS:
         return preset
     if custom:
@@ -384,7 +391,7 @@ def add_expense(payload: Dict[str, Any]) -> Dict[str, Any]:
     expense = {
         "id": uuid.uuid4().hex[:12],
         "title": str(payload.get("title", "")).strip() or "Без названия",
-        "amount": max(0, int(payload.get("amount", 0) or 0)),
+        "amount": _safe_amount(payload.get("amount", 0)),
         "category": category,
         "is_recurring": bool(payload.get("is_recurring")),
         "date": (_parse_datetime(payload.get("date")) or _utc_now())[:10],
@@ -406,7 +413,7 @@ def update_expense(expense_id: str, patch: Dict[str, Any]) -> Optional[Dict[str,
             if "title" in patch:
                 exp["title"] = str(patch["title"] or "").strip() or exp["title"]
             if "amount" in patch:
-                exp["amount"] = max(0, int(patch["amount"] or 0))
+                exp["amount"] = _safe_amount(patch["amount"])
             if "category" in patch or "category_custom" in patch:
                 exp["category"] = _normalize_expense_category(patch)
             if "is_recurring" in patch:

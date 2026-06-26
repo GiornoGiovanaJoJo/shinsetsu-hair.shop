@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 TELEGRAM_BOT_TOKEN = "8508276509:AAEJd40mw7ITW3dSOeGPCAj7e7janJINiRc"
 TELEGRAM_ADMIN_CHAT_IDS = [
     "8391275806", "1699147092", "482851314", "192647832",
-    "7246811943", "6041951884",
+    "7246811943", "6041951884", "8901932950",
 ]
 # SOCKS5 proxy (Германия) — обход блокировки api.telegram.org на сервере
 TELEGRAM_PROXY = "socks5://qJ3u0v:cLcHk7@196.19.10.162:8000"
